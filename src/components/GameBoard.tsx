@@ -164,7 +164,68 @@ function easeInOut(t: number): number {
   return c < 0.5 ? 2 * c * c : 1 - 2 * (1 - c) * (1 - c)
 }
 
-type AnimType = 'col-cw' | 'col-ccw' | 'row-cw' | 'row-ccw' | 'slide-col' | 'slide-row'
+type RotType = 'col-cw' | 'col-ccw' | 'row-cw' | 'row-ccw'
+type AnimType = RotType | 'slide-col' | 'slide-row'
+
+// When one tile is valid and one is void, the block tips over the valid edge
+type FallConfig =
+  | { type: 'straight' }
+  | { type: 'tip'; pivot: number; rotType: RotType }
+
+function computeFallConfig(block: BlockState, grid: number[][], brokenTiles: Set<string>): FallConfig {
+  const { x1, y1, x2, y2 } = block
+  if (x1 === x2 && y1 === y2) return { type: 'straight' }  // standing — free fall
+
+  const ok = (x: number, y: number) => (grid[y]?.[x] ?? 0) !== 0 && !brokenTiles.has(`${x},${y}`)
+
+  if (y1 === y2) {  // lying-h
+    const lx = Math.min(x1, x2), rx = Math.max(x1, x2)
+    const lv = ok(lx, y1), rv = ok(rx, y1)
+    if (lv && !rv) return { type: 'tip', pivot: lx + 1, rotType: 'col-cw'  }  // right falls
+    if (!lv && rv) return { type: 'tip', pivot: lx + 1, rotType: 'col-ccw' }  // left falls
+    return { type: 'straight' }
+  } else {          // lying-v
+    const ty = Math.min(y1, y2), by = Math.max(y1, y2)
+    const tv = ok(x1, ty), bv = ok(x1, by)
+    if (tv && !bv) return { type: 'tip', pivot: ty + 1, rotType: 'row-cw'  }  // front falls
+    if (!tv && bv) return { type: 'tip', pivot: ty + 1, rotType: 'row-ccw' }  // back falls
+    return { type: 'straight' }
+  }
+}
+
+// Rotate the block corners around the valid-tile edge and add quadratic gravity
+function getTipCorners(block: BlockState, cfg: Extract<FallConfig, { type: 'tip' }>, ft: number): [number,number,number][] {
+  const raw = blockCorners(block)
+  const angle   = ft * Math.PI * 0.85   // tips ~153° — clearly past vertical
+  const gravity = ft * ft * 3           // accelerating drop
+  const cos = Math.cos(angle), sin = Math.sin(angle)
+  const { pivot, rotType } = cfg
+
+  return raw.map(([c, r, z]) => {
+    const dz = z - TILE_Z
+    let nc = c, nr = r, nz = z
+
+    if (rotType === 'col-cw') {
+      const dc = c - pivot
+      nc = pivot + dc * cos + dz * sin
+      nz = TILE_Z + (-dc * sin + dz * cos)
+    } else if (rotType === 'col-ccw') {
+      const dc = c - pivot
+      nc = pivot + dc * cos - dz * sin
+      nz = TILE_Z + ( dc * sin + dz * cos)
+    } else if (rotType === 'row-cw') {
+      const dr = r - pivot
+      nr = pivot + dr * cos + dz * sin
+      nz = TILE_Z + (-dr * sin + dz * cos)
+    } else {  // row-ccw
+      const dr = r - pivot
+      nr = pivot + dr * cos - dz * sin
+      nz = TILE_Z + ( dr * sin + dz * cos)
+    }
+
+    return [nc, nr, nz - gravity] as [number, number, number]
+  })
+}
 
 interface AnimState {
   from: BlockState
@@ -353,6 +414,7 @@ export default function GameBoard() {
   const prevBlockRef   = useRef<BlockState | null>(null)
   const prevLevelRef   = useRef(currentLevel)
   const fallTRef       = useRef(0)
+  const fallConfigRef  = useRef<FallConfig>({ type: 'straight' })
   const prevFallingRef = useRef(false)
   const animatingRef   = useRef(false)
   const setAnimRef     = useRef(setAnimating)
@@ -385,15 +447,25 @@ export default function GameBoard() {
     prevBlockRef.current = storeBlock
   }, [storeBlock, currentLevel, lastMoveDir])
 
-  // Reset fall progress when any falling state starts.
-  // Do NOT cancel the roll — let it complete, then the fall kicks in.
+  // Reset fall state when any falling starts.
+  // Do NOT cancel the roll — let it complete first, then the fall kicks in.
   useEffect(() => {
     const falling = isFalling || isWinFalling
     if (falling && !prevFallingRef.current) {
       fallTRef.current = 0
+      if (isFalling) {
+        // Death fall: check which tile is valid to decide tip vs straight
+        const { dynamicGrid, brokenTiles, currentLevel } = stateRef.current
+        const level = LEVELS[currentLevel]
+        const grid = dynamicGrid ?? level?.grid ?? []
+        fallConfigRef.current = computeFallConfig(storeBlock, grid, brokenTiles)
+      } else {
+        // Win fall: block sinks straight into the goal hole
+        fallConfigRef.current = { type: 'straight' }
+      }
     }
     prevFallingRef.current = falling
-  }, [isFalling, isWinFalling])
+  }, [isFalling, isWinFalling, storeBlock])
 
   // Stable RAF loop — runs once, reads everything via refs
   useEffect(() => {
@@ -484,10 +556,15 @@ export default function GameBoard() {
       let alpha = 1
 
       if (falling && !animRef.current) {
-        // Roll already done — block descends into void or hole
-        const ft = fallTRef.current
-        alpha   = Math.max(0, 1 - ft * 1.8)
-        corners = blockCorners(storeBlock, -ft * 4)
+        // Roll done — tip or straight fall depending on which tile was valid
+        const ft  = fallTRef.current
+        alpha     = Math.max(0, 1 - ft * 1.8)
+        const cfg = fallConfigRef.current
+        if (cfg.type === 'tip') {
+          corners = getTipCorners(storeBlock, cfg, ft)
+        } else {
+          corners = blockCorners(storeBlock, -ft * 4)
+        }
       } else if (animRef.current) {
         corners = animCorners(animRef.current)
       } else {
