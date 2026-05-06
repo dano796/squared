@@ -1,0 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0a1a;
+  font-family: 'Share Tech Mono', monospace;
+  color: #e2e8f0;
+  user-select: none;
+  touch-action: none;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #0a0a1a; }
+::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
+
+/* Grid perspective container */
+.grid-perspective {
+  perspective: 600px;
+  perspective-origin: 50% 30%;
+}
+
+.grid-tilt {
+  transform: rotateX(20deg);
+  transform-style: preserve-3d;
+}
+
+/* Block 3D styles */
+.block-standing {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.3),
+    2px 2px 0 #1e3a8a,
+    3px 3px 0 #1e40af,
+    0 0 20px rgba(59, 130, 246, 0.6);
+  border: 1px solid #93c5fd;
+}
+
+.block-lying-h {
+  background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    2px 2px 0 #1e3a8a,
+    0 0 15px rgba(59, 130, 246, 0.5);
+  border: 1px solid #93c5fd;
+}
+
+.block-lying-v {
+  background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    2px 2px 0 #1e3a8a,
+    0 0 15px rgba(59, 130, 246, 0.5);
+  border: 1px solid #93c5fd;
+}
+
+/* Tile styles */
+.tile-floor {
+  background: linear-gradient(145deg, #243460 0%, #1a2744 100%);
+  border: 1px solid #2d4a7a;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.tile-goal {
+  background: radial-gradient(circle, #1a0a2e 0%, #0d0118 100%);
+  border: 1px solid #7c3aed;
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+.tile-fragile {
+  background: linear-gradient(145deg, #78350f 0%, #451a03 100%);
+  border: 1px solid #f59e0b;
+  box-shadow: inset 0 0 8px rgba(245, 158, 11, 0.2);
+}
+
+.tile-fragile::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px,
+      transparent 4px,
+      rgba(245, 158, 11, 0.1) 4px,
+      rgba(245, 158, 11, 0.1) 5px
+    );
+  pointer-events: none;
+}
+
+.tile-switch-soft {
+  background: linear-gradient(145deg, #14532d 0%, #052e16 100%);
+  border: 1px solid #22c55e;
+  box-shadow: inset 0 0 8px rgba(34, 197, 94, 0.3);
+}
+
+.tile-switch-hard {
+  background: linear-gradient(145deg, #7f1d1d 0%, #450a0a 100%);
+  border: 1px solid #ef4444;
+  box-shadow: inset 0 0 8px rgba(239, 68, 68, 0.3);
+}
+
+/* D-pad button */
+.dpad-btn {
+  @apply flex items-center justify-center rounded-lg font-bold;
+  background: rgba(30, 58, 138, 0.7);
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  backdrop-filter: blur(4px);
+  transition: all 0.08s ease;
+  box-shadow: 0 4px 0 rgba(15, 30, 80, 0.8), 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+.dpad-btn:active,
+.dpad-btn.pressed {
+  background: rgba(59, 130, 246, 0.5);
+  border-color: #60a5fa;
+  box-shadow: 0 2px 0 rgba(15, 30, 80, 0.8), 0 0 15px rgba(59, 130, 246, 0.4);
+  transform: translateY(2px);
+}
+
+/* Background grid pattern */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Scanline effect */
+.scanlines::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Neon text */
+.neon-blue {
+  text-shadow: 0 0 10px #60a5fa, 0 0 20px #3b82f6, 0 0 40px #2563eb;
+}
+
+.neon-purple {
+  text-shadow: 0 0 10px #c084fc, 0 0 20px #a855f7, 0 0 40px #7c3aed;
+}
+
+/* Screen transition */
+.screen-enter {
+  animation: screenEnter 0.3s ease-out forwards;
+}
+
+@keyframes screenEnter {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px 2px #a855f7; }
+  50% { box-shadow: 0 0 25px 8px #a855f7; }
+}
