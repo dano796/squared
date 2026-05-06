@@ -26,7 +26,10 @@ interface GameStore {
   brokenTiles: Set<string>
   dynamicGrid: number[][] | null
   isFalling: boolean
+  isWinFalling: boolean
   isShaking: boolean
+  lastMoveDir: Direction | null
+  isAnimating: boolean
 
   setScreen: (s: Screen) => void
   startLevel: (levelIndex: number) => void
@@ -34,6 +37,7 @@ interface GameStore {
   resetLevel: () => void
   tickTime: () => void
   completeLevel: (stars: number) => void
+  setAnimating: (v: boolean) => void
 }
 
 function calcStars(moves: number, optimalMoves: number): number {
@@ -55,9 +59,14 @@ export const useGameStore = create<GameStore>()(
       brokenTiles: new Set(),
       dynamicGrid: null,
       isFalling: false,
+      isWinFalling: false,
       isShaking: false,
+      lastMoveDir: null,
+      isAnimating: false,
 
       setScreen: (screen) => set({ screen }),
+
+      setAnimating: (v) => set({ isAnimating: v }),
 
       startLevel: (idx) => {
         const level = LEVELS[idx]
@@ -71,11 +80,15 @@ export const useGameStore = create<GameStore>()(
           dynamicGrid: level.grid.map(row => [...row]),
           screen: 'game',
           isFalling: false,
+          isWinFalling: false,
           isShaking: false,
+          lastMoveDir: null,
+          isAnimating: false,
         })
       },
 
       moveBlock: (dir) => {
+        if (get().isAnimating || get().isFalling || get().isWinFalling) return
         const { block, currentLevel, moves, brokenTiles, dynamicGrid } = get()
         const level = LEVELS[currentLevel]
         if (!level) return
@@ -85,10 +98,11 @@ export const useGameStore = create<GameStore>()(
         const result = validateMove(newBlock, { ...level, grid }, brokenTiles)
 
         if (result === 'lose') {
-          set({ isFalling: true })
+          // Move block to the invalid position so the roll animation plays into the void
+          set({ block: newBlock, lastMoveDir: dir, isFalling: true })
           setTimeout(() => {
             set({ screen: 'gameOver', isFalling: false })
-          }, 700)
+          }, 950)
           return
         }
 
@@ -111,15 +125,19 @@ export const useGameStore = create<GameStore>()(
 
         if (result === 'win') {
           const stars = calcStars(newMoves, level.optimalMoves)
+          // Block rolls to goal then falls into the hole before win screen
           set({
             block: newBlock,
             moves: newMoves,
             brokenTiles: newBroken,
             dynamicGrid: newGrid,
+            lastMoveDir: dir,
+            isWinFalling: true,
           })
           setTimeout(() => {
+            set({ isWinFalling: false })
             get().completeLevel(stars)
-          }, 400)
+          }, 950)
           return
         }
 
@@ -128,6 +146,7 @@ export const useGameStore = create<GameStore>()(
           moves: newMoves,
           brokenTiles: newBroken,
           dynamicGrid: newGrid,
+          lastMoveDir: dir,
         })
       },
 

@@ -1,11 +1,11 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 import { useGameStore } from '../store/gameStore'
 import { LEVELS } from '../data/levels'
+import type { BlockState, Direction } from '../logic/blockLogic'
+import { getOrientation } from '../logic/blockLogic'
 
 // ─────────────────────────────────────────────
 //  ISOMETRIC MATH
-//  projection: (col, row, z) → canvas (x, y)
-//  z=0 is ground, z>0 is up
 // ─────────────────────────────────────────────
 type P = { x: number; y: number }
 
@@ -43,7 +43,7 @@ function clipDiamond(ctx: CanvasRenderingContext2D, p: ReturnType<typeof makePro
 // ─────────────────────────────────────────────
 //  TILE DRAWING
 // ─────────────────────────────────────────────
-const TILE_Z = 0.22  // tile thickness in grid-z units
+const TILE_Z = 0.22
 
 interface TileColors { top: string; right: string; front: string; stroke: string }
 const TC: Record<number, TileColors> = {
@@ -54,50 +54,22 @@ const TC: Record<number, TileColors> = {
   5: { top: '#420a0a', right: '#2b0606', front: '#180404', stroke: 'rgba(239,68,68,0.4)' },
 }
 
-function drawIsoTile(
-  ctx: CanvasRenderingContext2D,
-  p: ReturnType<typeof makeProj>,
-  col: number, row: number,
-  tile: number
-) {
+function drawIsoTile(ctx: CanvasRenderingContext2D, p: ReturnType<typeof makeProj>, col: number, row: number, tile: number) {
   const c = TC[tile] ?? TC[1]
   const z = TILE_Z
-
-  // Right side face (appears on screen-right)
-  poly(ctx,
-    [p(col + 1, row, 0), p(col + 1, row + 1, 0), p(col + 1, row + 1, z), p(col + 1, row, z)],
-    c.right
-  )
-  // Front side face (appears on screen-left/bottom)
-  poly(ctx,
-    [p(col, row + 1, 0), p(col + 1, row + 1, 0), p(col + 1, row + 1, z), p(col, row + 1, z)],
-    c.front
-  )
-  // Top face (diamond)
-  poly(ctx,
-    [p(col, row, z), p(col + 1, row, z), p(col + 1, row + 1, z), p(col, row + 1, z)],
-    c.top, c.stroke
-  )
+  poly(ctx, [p(col+1,row,0), p(col+1,row+1,0), p(col+1,row+1,z), p(col+1,row,z)], c.right)
+  poly(ctx, [p(col,row+1,0), p(col+1,row+1,0), p(col+1,row+1,z), p(col,row+1,z)], c.front)
+  poly(ctx, [p(col,row,z), p(col+1,row,z), p(col+1,row+1,z), p(col,row+1,z)], c.top, c.stroke)
 }
 
-function drawGoalTile(
-  ctx: CanvasRenderingContext2D,
-  p: ReturnType<typeof makeProj>,
-  col: number, row: number,
-  TW: number, TH: number,
-  time: number
-) {
+function drawGoalTile(ctx: CanvasRenderingContext2D, p: ReturnType<typeof makeProj>, col: number, row: number, TW: number, TH: number, time: number) {
   drawIsoTile(ctx, p, col, row, 2)
-
   const z = TILE_Z
-  const pts = [p(col, row, z), p(col + 1, row, z), p(col + 1, row + 1, z), p(col, row + 1, z)]
+  const pts = [p(col,row,z), p(col+1,row,z), p(col+1,row+1,z), p(col,row+1,z)]
   const cx = pts.reduce((s, pt) => s + pt.x, 0) / 4
   const cy = pts.reduce((s, pt) => s + pt.y, 0) / 4
-
   ctx.save()
   clipDiamond(ctx, p, col, row, z)
-
-  // Deep hole radial gradient
   const r = Math.max(TW, TH) * 0.5
   const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r)
   grd.addColorStop(0, 'rgba(0,0,0,1)')
@@ -106,43 +78,29 @@ function drawGoalTile(
   grd.addColorStop(1, 'rgba(168,85,247,0.05)')
   ctx.fillStyle = grd
   ctx.fillRect(cx - r, cy - r, r * 2, r * 2)
-
-  // Pulsing ring
   const pulse = 0.55 + 0.45 * Math.sin(time * 2.8)
   ctx.strokeStyle = `rgba(168,85,247,${pulse})`
   ctx.lineWidth = 1.5
   ctx.beginPath()
   ctx.ellipse(cx, cy, TW * 0.17, TH * 0.2, 0, 0, Math.PI * 2)
   ctx.stroke()
-
-  // Inner glow dot
   ctx.fillStyle = `rgba(196,132,252,${pulse * 0.6})`
   ctx.beginPath()
   ctx.ellipse(cx, cy, TW * 0.06, TH * 0.07, 0, 0, Math.PI * 2)
   ctx.fill()
-
   ctx.restore()
 }
 
-function drawFragileTile(
-  ctx: CanvasRenderingContext2D,
-  p: ReturnType<typeof makeProj>,
-  col: number, row: number,
-  TW: number, TH: number
-) {
+function drawFragileTile(ctx: CanvasRenderingContext2D, p: ReturnType<typeof makeProj>, col: number, row: number, TW: number, TH: number) {
   drawIsoTile(ctx, p, col, row, 3)
-
   const z = TILE_Z
-  const pts = [p(col, row, z), p(col + 1, row, z), p(col + 1, row + 1, z), p(col, row + 1, z)]
+  const pts = [p(col,row,z), p(col+1,row,z), p(col+1,row+1,z), p(col,row+1,z)]
   const cx = pts.reduce((s, pt) => s + pt.x, 0) / 4
   const cy = pts.reduce((s, pt) => s + pt.y, 0) / 4
-
   ctx.save()
   clipDiamond(ctx, p, col, row, z)
-
   ctx.strokeStyle = 'rgba(245,158,11,0.65)'
   ctx.lineWidth = 0.9
-
   const crack = (dx1: number, dy1: number, bx: number, by: number, dx2: number, dy2: number) => {
     ctx.beginPath()
     ctx.moveTo(cx + TW * dx1, cy + TH * dy1)
@@ -153,30 +111,19 @@ function drawFragileTile(
   crack(-0.08, -0.35, 0.04, 0.05, -0.06, 0.35)
   crack(0.15, -0.2, 0.02, 0.08, 0.12, 0.3)
   crack(-0.2, 0.1, -0.06, 0.18, -0.15, 0.3)
-
   ctx.restore()
 }
 
-function drawSwitchTile(
-  ctx: CanvasRenderingContext2D,
-  p: ReturnType<typeof makeProj>,
-  col: number, row: number,
-  tile: number,
-  TW: number
-) {
+function drawSwitchTile(ctx: CanvasRenderingContext2D, p: ReturnType<typeof makeProj>, col: number, row: number, tile: number, TW: number) {
   drawIsoTile(ctx, p, col, row, tile)
-
   const z = TILE_Z
-  const pts = [p(col, row, z), p(col + 1, row, z), p(col + 1, row + 1, z), p(col, row + 1, z)]
+  const pts = [p(col,row,z), p(col+1,row,z), p(col+1,row+1,z), p(col,row+1,z)]
   const cx = pts.reduce((s, pt) => s + pt.x, 0) / 4
   const cy = pts.reduce((s, pt) => s + pt.y, 0) / 4
   const r = TW * 0.17
-
   ctx.save()
   clipDiamond(ctx, p, col, row, z)
-
   if (tile === 4) {
-    // Soft switch — circle
     ctx.strokeStyle = '#22c55e'
     ctx.lineWidth = 1.5
     ctx.globalAlpha = 0.9
@@ -185,14 +132,12 @@ function drawSwitchTile(
     ctx.stroke()
     ctx.fillStyle = 'rgba(34,197,94,0.25)'
     ctx.fill()
-    // inner dot
     ctx.globalAlpha = 0.7
     ctx.fillStyle = '#22c55e'
     ctx.beginPath()
     ctx.ellipse(cx, cy, r * 0.35, r * 0.22, 0, 0, Math.PI * 2)
     ctx.fill()
   } else {
-    // Hard switch — X
     ctx.strokeStyle = '#ef4444'
     ctx.lineWidth = 1.8
     ctx.globalAlpha = 0.9
@@ -204,110 +149,183 @@ function drawSwitchTile(
     ctx.moveTo(cx + rx, cy - ry); ctx.lineTo(cx - rx, cy + ry)
     ctx.stroke()
   }
-
   ctx.globalAlpha = 1
   ctx.restore()
 }
 
 // ─────────────────────────────────────────────
-//  BLOCK DRAWING  (isometric 3D box)
+//  BLOCK ANIMATION SYSTEM
 // ─────────────────────────────────────────────
-function drawBlock(
+const ANIM_DURATION = 0.18  // seconds per move
+const FALL_DURATION = 0.55  // seconds for fall
+
+function easeInOut(t: number): number {
+  const c = Math.min(t, 1)
+  return c < 0.5 ? 2 * c * c : 1 - 2 * (1 - c) * (1 - c)
+}
+
+type AnimType = 'col-cw' | 'col-ccw' | 'row-cw' | 'row-ccw' | 'slide-col' | 'slide-row'
+
+interface AnimState {
+  from: BlockState
+  to: BlockState
+  type: AnimType
+  pivot: number
+  t: number
+}
+
+function getAnimParams(from: BlockState, dir: Direction): { type: AnimType; pivot: number } {
+  const orient = getOrientation(from)
+  const col = Math.min(from.x1, from.x2)
+  const row = Math.min(from.y1, from.y2)
+  if (orient === 'standing') {
+    if (dir === 'right') return { type: 'col-cw',  pivot: col + 1 }
+    if (dir === 'left')  return { type: 'col-ccw', pivot: col }
+    if (dir === 'down')  return { type: 'row-cw',  pivot: row + 1 }
+    return                      { type: 'row-ccw', pivot: row }
+  }
+  if (orient === 'lying-h') {
+    if (dir === 'right') return { type: 'col-cw',  pivot: col + 2 }
+    if (dir === 'left')  return { type: 'col-ccw', pivot: col }
+    if (dir === 'down')  return { type: 'row-cw',  pivot: row + 1 }  // bd=1
+    return                      { type: 'row-ccw', pivot: row }
+  }
+  // lying-v: bd=2, bw=1
+  if (dir === 'down')  return { type: 'row-cw',  pivot: row + 2 }
+  if (dir === 'up')    return { type: 'row-ccw', pivot: row }
+  if (dir === 'right') return { type: 'col-cw',  pivot: col + 1 }
+  return                      { type: 'col-ccw', pivot: col }
+}
+
+function getBlockDims(block: BlockState) {
+  const orient = getOrientation(block)
+  const col = Math.min(block.x1, block.x2)
+  const row = Math.min(block.y1, block.y2)
+  return {
+    col, row,
+    bw: orient === 'lying-h' ? 2 : 1,
+    bd: orient === 'lying-v' ? 2 : 1,
+    bh: orient === 'standing' ? 2 : 1,
+  }
+}
+
+// Rotate or slide a single 3D point according to the animation
+function transformPt(
+  c: number, r: number, z: number,
+  anim: AnimState, eased: number
+): [number, number, number] {
+  const { type, pivot, from, to } = anim
+  const angle = eased * Math.PI / 2
+  const cos = Math.cos(angle), sin = Math.sin(angle)
+  const dz = z - TILE_Z
+
+  if (type === 'col-cw') {
+    const dc = c - pivot
+    return [pivot + dc * cos + dz * sin, r, TILE_Z + (-dc * sin + dz * cos)]
+  }
+  if (type === 'col-ccw') {
+    const dc = c - pivot
+    return [pivot + dc * cos - dz * sin, r, TILE_Z + (dc * sin + dz * cos)]
+  }
+  if (type === 'row-cw') {
+    const dr = r - pivot
+    return [c, pivot + dr * cos + dz * sin, TILE_Z + (-dr * sin + dz * cos)]
+  }
+  if (type === 'row-ccw') {
+    const dr = r - pivot
+    return [c, pivot + dr * cos - dz * sin, TILE_Z + (dr * sin + dz * cos)]
+  }
+  if (type === 'slide-col') {
+    const dc = Math.min(to.x1, to.x2) - Math.min(from.x1, from.x2)
+    return [c + dc * eased, r, z]
+  }
+  // slide-row
+  const dr = Math.min(to.y1, to.y2) - Math.min(from.y1, from.y2)
+  return [c, r + dr * eased, z]
+}
+
+// Build the 8 corners of the block box in 3D space
+function blockCorners(block: BlockState, zOffset = 0): [number, number, number][] {
+  const { col, row, bw, bd, bh } = getBlockDims(block)
+  const bz = TILE_Z + zOffset
+  const tz = bz + bh
+  return [
+    [col,    row,    bz],  // 0 back-left-bottom
+    [col+bw, row,    bz],  // 1 back-right-bottom
+    [col+bw, row+bd, bz],  // 2 front-right-bottom
+    [col,    row+bd, bz],  // 3 front-left-bottom
+    [col,    row,    tz],  // 4 back-left-top
+    [col+bw, row,    tz],  // 5 back-right-top
+    [col+bw, row+bd, tz],  // 6 front-right-top
+    [col,    row+bd, tz],  // 7 front-left-top
+  ]
+}
+
+function animCorners(anim: AnimState): [number, number, number][] {
+  const eased = easeInOut(anim.t)
+  return blockCorners(anim.from).map(([c, r, z]) => transformPt(c, r, z, anim, eased)) as [number, number, number][]
+}
+
+// Draw block from 8 pre-computed 3D corners
+function drawBlock3D(
   ctx: CanvasRenderingContext2D,
   p: ReturnType<typeof makeProj>,
-  x1: number, y1: number, x2: number, y2: number,
-  TW: number, TH: number
+  corners: [number, number, number][],
+  TW: number, TH: number,
+  alpha = 1,
 ) {
-  const standing = x1 === x2 && y1 === y2
-  const lyingH = y1 === y2 && x1 !== x2
+  const pp = (i: number) => { const [c, r, z] = corners[i]; return p(c, r, z) }
 
-  const col = Math.min(x1, x2)
-  const row = Math.min(y1, y2)
-  const bw = lyingH ? 2 : 1       // grid width
-  const bd = (!standing && !lyingH) ? 2 : 1  // grid depth
-  const bh = standing ? 2 : 1    // grid height (z units)
-
-  const baseZ = TILE_Z
-  const topZ = baseZ + bh
-
-  // ── Shadow glow beneath block ──
-  const sc = p(col + bw / 2, row + bd / 2, baseZ)
-  const sgrd = ctx.createRadialGradient(sc.x, sc.y + 4, 0, sc.x, sc.y + 4, TW * Math.max(bw, bd) * 0.75)
-  sgrd.addColorStop(0, 'rgba(59,130,246,0.28)')
+  // Shadow
+  const midC = (corners[0][0] + corners[6][0]) / 2
+  const midR = (corners[0][1] + corners[6][1]) / 2
+  const sc = p(midC, midR, TILE_Z)
+  const sgrd = ctx.createRadialGradient(sc.x, sc.y + 4, 0, sc.x, sc.y + 4, TW * 1.4)
+  sgrd.addColorStop(0, `rgba(59,130,246,${0.28 * alpha})`)
   sgrd.addColorStop(1, 'rgba(59,130,246,0)')
   ctx.fillStyle = sgrd
-  ctx.fillRect(sc.x - TW * bw, sc.y - TH * (bd + bh + 1), TW * bw * 2, TH * (bd + bh + 2) * 2)
+  ctx.fillRect(sc.x - TW * 2.5, sc.y - TH * 7, TW * 5, TH * 14)
 
-  // ── Right face (+col edge) ──
-  poly(ctx, [
-    p(col + bw, row,      baseZ),
-    p(col + bw, row + bd, baseZ),
-    p(col + bw, row + bd, topZ),
-    p(col + bw, row,      topZ),
-  ], '#1d4ed8')
+  ctx.globalAlpha = alpha
 
-  // Right edge line
-  ctx.strokeStyle = 'rgba(59,130,246,0.45)'
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  const re0 = p(col + bw, row, topZ), re1 = p(col + bw, row, baseZ)
-  ctx.moveTo(re0.x, re0.y); ctx.lineTo(re1.x, re1.y)
-  ctx.stroke()
+  // Painter's order: back faces first, then right/front, then top
+  poly(ctx, [pp(0), pp(1), pp(5), pp(4)], '#0f2560')  // back  (row=min)
+  poly(ctx, [pp(0), pp(3), pp(7), pp(4)], '#152e74')  // left  (col=min)
+  poly(ctx, [pp(1), pp(2), pp(6), pp(5)], '#1d4ed8')  // right (col=max)
+  poly(ctx, [pp(3), pp(2), pp(6), pp(7)], '#2563eb')  // front (row=max)
+  poly(ctx, [pp(4), pp(5), pp(6), pp(7)], '#3b82f6')  // top   (z=max)
 
-  // ── Front face (+row edge) ──
-  poly(ctx, [
-    p(col,      row + bd, baseZ),
-    p(col + bw, row + bd, baseZ),
-    p(col + bw, row + bd, topZ),
-    p(col,      row + bd, topZ),
-  ], '#2563eb')
-
-  // Front edge line
-  ctx.beginPath()
-  const fe0 = p(col, row + bd, topZ), fe1 = p(col, row + bd, baseZ)
-  ctx.moveTo(fe0.x, fe0.y); ctx.lineTo(fe1.x, fe1.y)
-  ctx.stroke()
-
-  // ── Top face ──
-  const topFace = [
-    p(col,      row,      topZ),
-    p(col + bw, row,      topZ),
-    p(col + bw, row + bd, topZ),
-    p(col,      row + bd, topZ),
-  ]
-  poly(ctx, topFace, '#3b82f6')
-
-  // Gradient overlay on top
+  // Gradient shimmer on top face
   ctx.save()
+  ctx.globalAlpha = alpha
   ctx.beginPath()
-  topFace.forEach((pt, i) => (i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)))
+  const tf = [pp(4), pp(5), pp(6), pp(7)]
+  tf.forEach((pt, i) => (i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)))
   ctx.closePath()
   ctx.clip()
-
-  const xs = topFace.map(pt => pt.x), ys = topFace.map(pt => pt.y)
-  const minX = Math.min(...xs), minY = Math.min(...ys)
-  const maxX = Math.max(...xs), maxY = Math.max(...ys)
-  const lg = ctx.createLinearGradient(minX, minY, maxX, maxY)
+  const xs = tf.map(pt => pt.x), ys = tf.map(pt => pt.y)
+  const lg = ctx.createLinearGradient(Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys))
   lg.addColorStop(0, 'rgba(147,197,253,0.55)')
-  lg.addColorStop(0.45, 'rgba(96,165,250,0.1)')
+  lg.addColorStop(0.5, 'rgba(96,165,250,0.1)')
   lg.addColorStop(1, 'rgba(29,78,216,0.15)')
   ctx.fillStyle = lg
-  ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
+  ctx.fillRect(Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys))
   ctx.restore()
 
-  // Top face border + glow
-  poly(ctx, topFace, 'transparent', 'rgba(147,197,253,0.7)', 1.2)
-
+  // Top edge glow
   ctx.save()
+  ctx.globalAlpha = alpha
   ctx.shadowColor = '#60a5fa'
   ctx.shadowBlur = 10
   ctx.strokeStyle = '#93c5fd'
   ctx.lineWidth = 1
   ctx.beginPath()
-  ctx.moveTo(topFace[0].x, topFace[0].y)
-  ctx.lineTo(topFace[1].x, topFace[1].y)
+  ctx.moveTo(pp(4).x, pp(4).y)
+  ctx.lineTo(pp(5).x, pp(5).y)
   ctx.stroke()
   ctx.restore()
+
+  ctx.globalAlpha = 1
 }
 
 // ─────────────────────────────────────────────
@@ -315,94 +333,181 @@ function drawBlock(
 // ─────────────────────────────────────────────
 export default function GameBoard() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const timeRef = useRef(0)
 
-  const { block, currentLevel, brokenTiles, dynamicGrid } = useGameStore()
-  const level = LEVELS[currentLevel]
-  const grid = dynamicGrid ?? level?.grid ?? []
-  const rows = grid.length
-  const cols = grid[0]?.length ?? 0
+  // Read from store
+  const storeBlock    = useGameStore(s => s.block)
+  const currentLevel  = useGameStore(s => s.currentLevel)
+  const brokenTiles   = useGameStore(s => s.brokenTiles)
+  const dynamicGrid   = useGameStore(s => s.dynamicGrid)
+  const isFalling     = useGameStore(s => s.isFalling)
+  const isWinFalling  = useGameStore(s => s.isWinFalling)
+  const lastMoveDir   = useGameStore(s => s.lastMoveDir)
+  const setAnimating  = useGameStore(s => s.setAnimating)
 
-  // ── Compute adaptive tile size ──
-  const vw = typeof window !== 'undefined' ? Math.min(window.innerWidth - 8, 560) : 380
-  const vh = typeof window !== 'undefined' ? window.innerHeight * 0.54 : 300
-  const tileByW = (vw * 0.95) / ((cols + rows) * 0.5)
-  const tileByH = (vh * 0.88) / ((cols + rows) * 0.25 + 2.5)
-  const TILE_W = Math.floor(Math.min(tileByW, tileByH, 80))
-  const TILE_H = Math.floor(TILE_W / 2)
+  // Stable ref so the RAF loop always reads fresh state
+  const stateRef = useRef({ storeBlock, currentLevel, brokenTiles, dynamicGrid, isFalling, isWinFalling, lastMoveDir })
+  stateRef.current   = { storeBlock, currentLevel, brokenTiles, dynamicGrid, isFalling, isWinFalling, lastMoveDir }
 
-  const PAD_X = Math.ceil(TILE_W * 0.4)
-  const PAD_Y = Math.ceil(TILE_H * 2.8)  // top padding for block height
-  const canvasW = (cols + rows) * Math.ceil(TILE_W / 2) + PAD_X * 2
-  const canvasH = (cols + rows) * Math.ceil(TILE_H / 2) + PAD_Y + Math.ceil(TILE_H * 1.2)
+  // Animation refs
+  const animRef        = useRef<AnimState | null>(null)
+  const prevBlockRef   = useRef<BlockState | null>(null)
+  const prevLevelRef   = useRef(currentLevel)
+  const fallTRef       = useRef(0)
+  const prevFallingRef = useRef(false)
+  const animatingRef   = useRef(false)
+  const setAnimRef     = useRef(setAnimating)
+  setAnimRef.current   = setAnimating
 
-  // Grid origin in canvas coords (where tile (0,0) top corner appears)
-  const ox = rows * Math.ceil(TILE_W / 2) + PAD_X
-  const oy = PAD_Y
+  // Start roll animation when block changes
+  useEffect(() => {
+    const levelChanged = currentLevel !== prevLevelRef.current
+    prevLevelRef.current = currentLevel
 
-  const draw = useCallback((time: number) => {
-    const canvas = canvasRef.current
-    if (!canvas || !level) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-    // Subtle ambient glow under the board
-    const bg = ctx.createRadialGradient(canvasW / 2, canvasH * 0.58, 0, canvasW / 2, canvasH * 0.58, canvasW * 0.65)
-    bg.addColorStop(0, 'rgba(30,58,138,0.13)')
-    bg.addColorStop(1, 'rgba(0,0,0,0)')
-    ctx.fillStyle = bg
-    ctx.fillRect(0, 0, canvasW, canvasH)
-
-    const p = makeProj(TILE_W, TILE_H, ox, oy)
-
-    // ── Collect & sort tiles (painter's algorithm: back→front) ──
-    const tiles: { col: number; row: number; tile: number }[] = []
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const tile = grid[r]?.[c] ?? 0
-        if (tile !== 0 && !brokenTiles.has(`${c},${r}`)) {
-          tiles.push({ col: c, row: r, tile })
-        }
-      }
-    }
-    tiles.sort((a, b) => (a.col + a.row) - (b.col + b.row))
-
-    // ── Draw tiles ──
-    for (const { col, row, tile } of tiles) {
-      if (tile === 2) {
-        drawGoalTile(ctx, p, col, row, TILE_W, TILE_H, time)
-      } else if (tile === 3) {
-        drawFragileTile(ctx, p, col, row, TILE_W, TILE_H)
-      } else if (tile === 4 || tile === 5) {
-        drawSwitchTile(ctx, p, col, row, tile, TILE_W)
-      } else {
-        drawIsoTile(ctx, p, col, row, tile)
-      }
+    if (levelChanged) {
+      animRef.current    = null
+      animatingRef.current = false
+      fallTRef.current   = 0
+      prevFallingRef.current = false
+      prevBlockRef.current = storeBlock
+      setAnimRef.current(false)
+      return
     }
 
-    // ── Draw block (always on top) ──
-    drawBlock(ctx, p, block.x1, block.y1, block.x2, block.y2, TILE_W, TILE_H)
-  }, [block, grid, brokenTiles, rows, cols, TILE_W, TILE_H, canvasW, canvasH, ox, oy, level])
+    const prev = prevBlockRef.current
+    if (prev !== null && lastMoveDir !== null) {
+      const params = getAnimParams(prev, lastMoveDir)
+      animRef.current = { from: prev, to: storeBlock, t: 0, ...params }
+      if (!animatingRef.current) {
+        animatingRef.current = true
+        setAnimRef.current(true)
+      }
+    }
+    prevBlockRef.current = storeBlock
+  }, [storeBlock, currentLevel, lastMoveDir])
 
-  // ── Animation loop (for goal pulse) ──
+  // Reset fall progress when any falling state starts.
+  // Do NOT cancel the roll — let it complete, then the fall kicks in.
+  useEffect(() => {
+    const falling = isFalling || isWinFalling
+    if (falling && !prevFallingRef.current) {
+      fallTRef.current = 0
+    }
+    prevFallingRef.current = falling
+  }, [isFalling, isWinFalling])
+
+  // Stable RAF loop — runs once, reads everything via refs
   useEffect(() => {
     let rafId: number
-    const loop = (t: number) => {
-      timeRef.current = t / 1000
-      draw(timeRef.current)
+    let lastNow = performance.now()
+
+    const loop = (now: number) => {
+      const dt = Math.min((now - lastNow) / 1000, 0.1)
+      lastNow = now
+      const time = now / 1000
+
+      const { storeBlock, currentLevel, brokenTiles, dynamicGrid, isFalling, isWinFalling } = stateRef.current
+      const falling = isFalling || isWinFalling
+      const level = LEVELS[currentLevel]
+      const canvas = canvasRef.current
+      if (!canvas || !level) { rafId = requestAnimationFrame(loop); return }
+      const ctx = canvas.getContext('2d')
+      if (!ctx) { rafId = requestAnimationFrame(loop); return }
+
+      const grid = dynamicGrid ?? level.grid
+      const rows = grid.length
+      const cols = grid[0]?.length ?? 0
+
+      // Adaptive sizing
+      const vw = Math.min(window.innerWidth - 8, 560)
+      const vh = window.innerHeight * 0.54
+      const tileByW = (vw * 0.95) / ((cols + rows) * 0.5)
+      const tileByH = (vh * 0.88) / ((cols + rows) * 0.25 + 2.5)
+      const TW = Math.floor(Math.min(tileByW, tileByH, 80))
+      const TH = Math.floor(TW / 2)
+      const PAD_X = Math.ceil(TW * 0.4)
+      const PAD_Y = Math.ceil(TH * 2.8)
+      const cW = (cols + rows) * Math.ceil(TW / 2) + PAD_X * 2
+      const cH = (cols + rows) * Math.ceil(TH / 2) + PAD_Y + Math.ceil(TH * 1.2)
+      const ox = rows * Math.ceil(TW / 2) + PAD_X
+      const oy = PAD_Y
+      if (canvas.width !== cW)  canvas.width  = cW
+      if (canvas.height !== cH) canvas.height = cH
+
+      // Advance roll — always runs, even during falling, so the roll completes first
+      if (animRef.current) {
+        animRef.current.t += dt / ANIM_DURATION
+        if (animRef.current.t >= 1) {
+          animRef.current = null
+          if (animatingRef.current && !falling) {
+            animatingRef.current = false
+            setAnimRef.current(false)
+          } else {
+            animatingRef.current = false
+          }
+        }
+      }
+
+      // Advance fall only once the roll animation is done
+      if (falling && !animRef.current) {
+        fallTRef.current = Math.min(fallTRef.current + dt / FALL_DURATION, 1)
+      }
+
+      const p = makeProj(TW, TH, ox, oy)
+
+      ctx.clearRect(0, 0, cW, cH)
+
+      // Ambient glow
+      const bg = ctx.createRadialGradient(cW/2, cH*0.58, 0, cW/2, cH*0.58, cW*0.65)
+      bg.addColorStop(0, 'rgba(30,58,138,0.13)')
+      bg.addColorStop(1, 'rgba(0,0,0,0)')
+      ctx.fillStyle = bg
+      ctx.fillRect(0, 0, cW, cH)
+
+      // Tiles — painter's order
+      const tiles: { col: number; row: number; tile: number }[] = []
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const tile = grid[r]?.[c] ?? 0
+          if (tile !== 0 && !brokenTiles.has(`${c},${r}`)) tiles.push({ col: c, row: r, tile })
+        }
+      }
+      tiles.sort((a, b) => (a.col + a.row) - (b.col + b.row))
+      for (const { col, row, tile } of tiles) {
+        if (tile === 2)            drawGoalTile(ctx, p, col, row, TW, TH, time)
+        else if (tile === 3)       drawFragileTile(ctx, p, col, row, TW, TH)
+        else if (tile === 4 || tile === 5) drawSwitchTile(ctx, p, col, row, tile, TW)
+        else                       drawIsoTile(ctx, p, col, row, tile)
+      }
+
+      // Block
+      let corners: [number, number, number][]
+      let alpha = 1
+
+      if (falling && !animRef.current) {
+        // Roll already done — block descends into void or hole
+        const ft = fallTRef.current
+        alpha   = Math.max(0, 1 - ft * 1.8)
+        corners = blockCorners(storeBlock, -ft * 4)
+      } else if (animRef.current) {
+        corners = animCorners(animRef.current)
+      } else {
+        corners = blockCorners(storeBlock)
+      }
+
+      drawBlock3D(ctx, p, corners, TW, TH, alpha)
+
       rafId = requestAnimationFrame(loop)
     }
+
     rafId = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(rafId)
-  }, [draw])
+  }, []) // stable — reads state via stateRef
 
   return (
     <canvas
       ref={canvasRef}
-      width={canvasW}
-      height={canvasH}
+      width={400}
+      height={300}
       style={{ display: 'block', maxWidth: '100%', imageRendering: 'crisp-edges' }}
     />
   )
