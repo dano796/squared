@@ -12,9 +12,23 @@ function formatTime(secs: number): string {
 }
 
 export default function GameScreen() {
-  const { currentLevel, moves, time, screen, moveBlock, resetLevel, setScreen, tickTime } = useGameStore()
+  const { currentLevel, moves, time, screen, moveBlock, resetLevel, setScreen, tickTime, isAnimating, isFalling, isWinFalling } = useGameStore()
   const level = LEVELS[currentLevel]
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const bufferedMove = useRef<Direction | null>(null)
+  const isAnimatingRef = useRef(isAnimating)
+  const isBusyRef = useRef(false)
+  isAnimatingRef.current = isAnimating
+  isBusyRef.current = isAnimating || isFalling || isWinFalling
+
+  // Flush buffered move when animation ends
+  useEffect(() => {
+    if (!isAnimating && bufferedMove.current && screen === 'game') {
+      const dir = bufferedMove.current
+      bufferedMove.current = null
+      moveBlock(dir)
+    }
+  }, [isAnimating, screen, moveBlock])
 
   useEffect(() => {
     if (screen !== 'game') return
@@ -29,7 +43,13 @@ export default function GameScreen() {
       w: 'up', s: 'down', a: 'left', d: 'right',
     }
     const dir = map[e.key]
-    if (dir) { e.preventDefault(); moveBlock(dir) }
+    if (!dir) return
+    e.preventDefault()
+    if (isBusyRef.current) {
+      bufferedMove.current = dir  // overwrite — only latest buffered move is kept
+    } else {
+      moveBlock(dir)
+    }
   }, [screen, moveBlock])
 
   useEffect(() => {
@@ -88,7 +108,9 @@ export default function GameScreen() {
 
       {/* D-Pad */}
       <div className="flex-shrink-0 flex items-center justify-center py-3 pb-5">
-        <DPad onMove={moveBlock} />
+        <DPad onMove={(dir) => {
+          if (isBusyRef.current) { bufferedMove.current = dir } else { moveBlock(dir) }
+        }} />
       </div>
     </div>
   )
