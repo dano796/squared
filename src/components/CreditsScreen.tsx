@@ -1,3 +1,4 @@
+import { ChevronLeft } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 
 const label: React.CSSProperties = {
@@ -200,6 +201,10 @@ export default function CreditsScreen() {
             fontSize: "0.875rem",
             cursor: "pointer",
             transition: "transform 0.08s",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
           }}
           onPointerDown={(e) =>
             (e.currentTarget.style.transform = "scale(0.97)")
@@ -207,6 +212,7 @@ export default function CreditsScreen() {
           onPointerUp={(e) => (e.currentTarget.style.transform = "")}
           onPointerLeave={(e) => (e.currentTarget.style.transform = "")}
         >
+          <ChevronLeft size={15} strokeWidth={2} />
           Back
         </button>
       </div>

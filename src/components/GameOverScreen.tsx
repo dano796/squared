@@ -1,3 +1,4 @@
+import { ChevronLeft } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 
 export default function GameOverScreen() {
@@ -109,10 +110,14 @@ export default function GameOverScreen() {
               color: "#4a3040",
               padding: "8px 0",
               transition: "color 0.1s",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
             }}
             onPointerEnter={(e) => (e.currentTarget.style.color = "#7070a0")}
             onPointerLeave={(e) => (e.currentTarget.style.color = "#4a3040")}
           >
+            <ChevronLeft size={14} strokeWidth={2} />
             Back to Levels
           </button>
         </div>

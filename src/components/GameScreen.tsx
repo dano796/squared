@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from "react";
+import { ChevronLeft, RotateCcw } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 import { LEVELS } from "../data/levels";
 import GameBoard from "./GameBoard";
@@ -128,8 +129,12 @@ export default function GameScreen() {
             background: "none",
             border: "none",
             cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
           }}
         >
+          <ChevronLeft size={15} strokeWidth={2} />
           Exit
         </button>
 
@@ -168,8 +173,12 @@ export default function GameScreen() {
             background: "none",
             border: "none",
             cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
           }}
         >
+          <RotateCcw size={14} strokeWidth={2} />
           Reset
         </button>
       </div>

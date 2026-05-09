@@ -1,4 +1,4 @@
-import { Lock, Star } from "lucide-react";
+import { ChevronLeft, Lock, Star } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 import { LEVELS } from "../data/levels";
 
@@ -53,8 +53,12 @@ export default function LevelSelectScreen() {
             border: "none",
             cursor: "pointer",
             padding: "4px 0",
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
           }}
         >
+          <ChevronLeft size={15} strokeWidth={2} />
           Back
         </button>
         <h2
