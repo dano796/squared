@@ -1,72 +1,190 @@
-import { useGameStore } from '../store/gameStore'
+import { useGameStore } from "../store/gameStore";
+
+const label: React.CSSProperties = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontWeight: 600,
+  fontSize: "0.65rem",
+  letterSpacing: "0.14em",
+  color: "#3e3e60",
+  textTransform: "uppercase",
+  marginBottom: 4,
+};
+
+const value: React.CSSProperties = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontWeight: 500,
+  fontSize: "0.875rem",
+  color: "#c8c6e0",
+};
+
+const sub: React.CSSProperties = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontWeight: 400,
+  fontSize: "0.75rem",
+  color: "#5a5a80",
+};
 
 export default function CreditsScreen() {
-  const setScreen = useGameStore(s => s.setScreen)
+  const setScreen = useGameStore((s) => s.setScreen);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-navy screen-enter"
-      style={{ background: 'radial-gradient(ellipse at 50% 80%, #0d0a1a 0%, #0a0a1a 70%)' }}
+    <div
+      className="fixed inset-0 flex flex-col items-center justify-center screen-enter"
+      style={{
+        background:
+          "linear-gradient(160deg, #12121c 0%, #0e0e14 60%, #111020 100%)",
+      }}
     >
-      <div className="absolute inset-0 bg-grid opacity-10" />
-
-      {/* Corner decorations */}
-      <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-purple-800 opacity-50" />
-      <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-purple-800 opacity-50" />
-      <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-purple-800 opacity-50" />
-      <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-purple-800 opacity-50" />
-
-      <div className="relative z-10 flex flex-col items-center gap-6 px-8 w-full max-w-sm text-center">
-        <h1 className="font-display font-black text-4xl text-white neon-purple tracking-widest"
-          style={{ letterSpacing: '0.2em' }}>
-          CREDITS
-        </h1>
-
-        <div className="w-full space-y-4">
-          <div className="border border-purple-900/50 rounded-sm p-4"
-            style={{ background: 'rgba(88, 28, 135, 0.1)' }}>
-            <div className="font-display text-xl font-bold text-purple-300 mb-1">SQUARED</div>
-            <div className="font-body text-xs text-purple-600">Version 1.0.0</div>
-          </div>
-
-          <div className="border border-blue-900/30 rounded-sm p-4 text-left space-y-3"
-            style={{ background: 'rgba(10, 10, 26, 0.5)' }}>
-            <div>
-              <div className="font-body text-xs text-blue-600 tracking-widest mb-1">ORIGINAL GAME</div>
-              <div className="font-display text-sm text-white">Bloxorz</div>
-              <div className="font-body text-xs text-blue-400">Damien Clarke · DX Interactive</div>
-            </div>
-
-            <div className="border-t border-blue-900/30 pt-3">
-              <div className="font-body text-xs text-blue-600 tracking-widest mb-1">DEVELOPED WITH</div>
-              <div className="font-body text-xs text-blue-300 space-y-0.5">
-                <div>React + TypeScript + Vite</div>
-                <div>Tailwind CSS</div>
-                <div>Zustand</div>
-              </div>
-            </div>
-
-            <div className="border-t border-blue-900/30 pt-3">
-              <div className="font-body text-xs text-blue-600 tracking-widest mb-1">FONTS</div>
-              <div className="font-body text-xs text-blue-300 space-y-0.5">
-                <div className="font-display">Orbitron</div>
-                <div>Share Tech Mono</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="font-body text-xs text-blue-800">
-            Fan-made tribute. All rights to original Bloxorz belong to their respective owners.
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 24,
+          padding: "0 24px",
+          width: "100%",
+          maxWidth: 340,
+        }}
+      >
+        {/* Title */}
+        <div style={{ textAlign: "center" }}>
+          <h1
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 800,
+              fontSize: "2rem",
+              color: "#e6e4f0",
+              letterSpacing: "0.08em",
+              marginBottom: 4,
+            }}
+          >
+            Credits
+          </h1>
+          <div
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 400,
+              fontSize: "0.7rem",
+              color: "#3a3a5e",
+              letterSpacing: "0.1em",
+            }}
+          >
+            v1.0.0
           </div>
         </div>
 
-        <button
-          className="w-full py-3 font-display text-sm font-semibold tracking-widest text-purple-300 rounded-sm border border-purple-800 active:scale-95 transition-transform"
-          style={{ background: 'rgba(88, 28, 135, 0.2)', letterSpacing: '0.2em' }}
-          onClick={() => setScreen('home')}
+        {/* Card */}
+        <div
+          style={{
+            width: "100%",
+            borderRadius: 16,
+            border: "1px solid #1e1e2e",
+            background: "#13131e",
+            overflow: "hidden",
+          }}
         >
-          ← BACK
+          {/* App header inside card */}
+          <div
+            style={{
+              padding: "16px 20px",
+              borderBottom: "1px solid #1e1e2e",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 800,
+                fontSize: "1.1rem",
+                color: "#6b7cf8",
+                letterSpacing: "0.1em",
+                marginBottom: 2,
+              }}
+            >
+              SQUARED
+            </div>
+            <div style={sub}>A Bloxorz-inspired puzzle game</div>
+          </div>
+
+          {/* Rows */}
+          <div
+            style={{
+              padding: "16px 20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 16,
+            }}
+          >
+            <div>
+              <div style={label}>Original Game</div>
+              <div style={value}>Bloxorz</div>
+              <div style={sub}>Damien Clarke · DX Interactive</div>
+            </div>
+
+            <div style={{ height: 1, background: "#1a1a28" }} />
+
+            <div>
+              <div style={label}>Built with</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                {["React + TypeScript + Vite", "Tailwind CSS", "Zustand"].map(
+                  (t) => (
+                    <div key={t} style={sub}>
+                      {t}
+                    </div>
+                  ),
+                )}
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: "#1a1a28" }} />
+
+            <div>
+              <div style={label}>Font</div>
+              <div style={sub}>Space Grotesk — Google Fonts</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Disclaimer */}
+        <p
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 400,
+            fontSize: "0.68rem",
+            color: "#2e2e48",
+            textAlign: "center",
+            lineHeight: 1.6,
+          }}
+        >
+          Fan-made tribute. All rights to the original Bloxorz belong to their
+          respective owners.
+        </p>
+
+        {/* Back */}
+        <button
+          onClick={() => setScreen("home")}
+          style={{
+            width: "100%",
+            padding: "12px 0",
+            borderRadius: 12,
+            border: "1px solid #1e1e2e",
+            background: "rgba(255,255,255,0.03)",
+            color: "#6b7cf8",
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 500,
+            fontSize: "0.875rem",
+            cursor: "pointer",
+            transition: "transform 0.08s",
+          }}
+          onPointerDown={(e) =>
+            (e.currentTarget.style.transform = "scale(0.97)")
+          }
+          onPointerUp={(e) => (e.currentTarget.style.transform = "")}
+          onPointerLeave={(e) => (e.currentTarget.style.transform = "")}
+        >
+          Back
         </button>
       </div>
     </div>
-  )
+  );
 }

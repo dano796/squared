@@ -65,34 +65,34 @@ interface TileColors {
 }
 const TC: Record<number, TileColors> = {
   1: {
-    top: "#1e3a5f",
-    right: "#0b1f38",
-    front: "#071428",
-    stroke: "rgba(96,165,250,0.18)",
+    top: "#1c2d4a",
+    right: "#0e1a2e",
+    front: "#080f1e",
+    stroke: "rgba(107,124,248,0.16)",
   },
   2: {
-    top: "#1a0a2e",
-    right: "#0f0620",
-    front: "#080012",
-    stroke: "rgba(168,85,247,0.5)",
+    top: "#160d38",
+    right: "#0d0824",
+    front: "#080514",
+    stroke: "rgba(124,110,245,0.55)",
   },
   3: {
-    top: "#3d2200",
-    right: "#281700",
-    front: "#160d00",
-    stroke: "rgba(245,158,11,0.45)",
+    top: "#3a2000",
+    right: "#251500",
+    front: "#130b00",
+    stroke: "rgba(201,150,58,0.5)",
   },
   4: {
-    top: "#042d14",
-    right: "#021a0c",
-    front: "#010d07",
-    stroke: "rgba(34,197,94,0.4)",
+    top: "#052b12",
+    right: "#031a0a",
+    front: "#010d05",
+    stroke: "rgba(90,175,122,0.4)",
   },
   5: {
-    top: "#420a0a",
-    right: "#2b0606",
-    front: "#180404",
-    stroke: "rgba(239,68,68,0.4)",
+    top: "#3e0a0a",
+    right: "#280606",
+    front: "#160303",
+    stroke: "rgba(216,90,90,0.4)",
   },
 };
 
@@ -162,18 +162,18 @@ function drawGoalTile(
   const r = Math.max(TW, TH) * 0.5;
   const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
   grd.addColorStop(0, "rgba(0,0,0,1)");
-  grd.addColorStop(0.35, "rgba(40,0,70,0.95)");
-  grd.addColorStop(0.65, "rgba(88,28,135,0.6)");
-  grd.addColorStop(1, "rgba(168,85,247,0.05)");
+  grd.addColorStop(0.35, "rgba(25,10,70,0.95)");
+  grd.addColorStop(0.65, "rgba(70,45,155,0.6)");
+  grd.addColorStop(1, "rgba(124,110,245,0.05)");
   ctx.fillStyle = grd;
   ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
   const pulse = 0.55 + 0.45 * Math.sin(time * 2.8);
-  ctx.strokeStyle = `rgba(168,85,247,${pulse})`;
+  ctx.strokeStyle = `rgba(140,125,248,${pulse})`;
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.ellipse(cx, cy, TW * 0.17, TH * 0.2, 0, 0, Math.PI * 2);
   ctx.stroke();
-  ctx.fillStyle = `rgba(196,132,252,${pulse * 0.6})`;
+  ctx.fillStyle = `rgba(170,155,252,${pulse * 0.6})`;
   ctx.beginPath();
   ctx.ellipse(cx, cy, TW * 0.06, TH * 0.07, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -508,19 +508,19 @@ function drawBlock3D(
     sc.y + 4,
     TW * 1.4,
   );
-  sgrd.addColorStop(0, `rgba(59,130,246,${0.28 * alpha})`);
-  sgrd.addColorStop(1, "rgba(59,130,246,0)");
+  sgrd.addColorStop(0, `rgba(79,104,230,${0.22 * alpha})`);
+  sgrd.addColorStop(1, "rgba(79,104,230,0)");
   ctx.fillStyle = sgrd;
   ctx.fillRect(sc.x - TW * 2.5, sc.y - TH * 7, TW * 5, TH * 14);
 
   ctx.globalAlpha = alpha;
 
   // Painter's order: back faces first, then right/front, then top
-  poly(ctx, [pp(0), pp(1), pp(5), pp(4)], "#0f2560"); // back  (row=min)
-  poly(ctx, [pp(0), pp(3), pp(7), pp(4)], "#152e74"); // left  (col=min)
-  poly(ctx, [pp(1), pp(2), pp(6), pp(5)], "#1d4ed8"); // right (col=max)
-  poly(ctx, [pp(3), pp(2), pp(6), pp(7)], "#2563eb"); // front (row=max)
-  poly(ctx, [pp(4), pp(5), pp(6), pp(7)], "#3b82f6"); // top   (z=max)
+  poly(ctx, [pp(0), pp(1), pp(5), pp(4)], "#0c1a50"); // back  (row=min)
+  poly(ctx, [pp(0), pp(3), pp(7), pp(4)], "#1a2e88"); // left  (col=min)
+  poly(ctx, [pp(1), pp(2), pp(6), pp(5)], "#2a44cc"); // right (col=max)
+  poly(ctx, [pp(3), pp(2), pp(6), pp(7)], "#3455d4"); // front (row=max)
+  poly(ctx, [pp(4), pp(5), pp(6), pp(7)], "#4f68e0"); // top   (z=max)
 
   // Gradient shimmer on top face
   ctx.save();
@@ -540,9 +540,9 @@ function drawBlock3D(
     Math.max(...xs),
     Math.max(...ys),
   );
-  lg.addColorStop(0, "rgba(147,197,253,0.55)");
-  lg.addColorStop(0.5, "rgba(96,165,250,0.1)");
-  lg.addColorStop(1, "rgba(29,78,216,0.15)");
+  lg.addColorStop(0, "rgba(160,175,255,0.45)");
+  lg.addColorStop(0.5, "rgba(107,124,248,0.08)");
+  lg.addColorStop(1, "rgba(42,68,204,0.12)");
   ctx.fillStyle = lg;
   ctx.fillRect(
     Math.min(...xs),
@@ -552,12 +552,10 @@ function drawBlock3D(
   );
   ctx.restore();
 
-  // Top edge glow
+  // Top edge highlight
   ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.shadowColor = "#60a5fa";
-  ctx.shadowBlur = 10;
-  ctx.strokeStyle = "#93c5fd";
+  ctx.globalAlpha = alpha * 0.7;
+  ctx.strokeStyle = "#8090e0";
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(pp(4).x, pp(4).y);
@@ -720,8 +718,14 @@ export default function GameBoard() {
         (cols + rows) * Math.ceil(TH / 2) + PAD_Y + Math.ceil(TH * 1.2);
       const ox = rows * Math.ceil(TW / 2) + PAD_X;
       const oy = PAD_Y;
-      if (canvas.width !== cW) canvas.width = cW;
-      if (canvas.height !== cH) canvas.height = cH;
+      const dpr = window.devicePixelRatio || 1;
+      const cWp = Math.round(cW * dpr);
+      const cHp = Math.round(cH * dpr);
+      if (canvas.width !== cWp) canvas.width = cWp;
+      if (canvas.height !== cHp) canvas.height = cHp;
+      canvas.style.width = cW + "px";
+      canvas.style.height = cH + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Advance roll — always runs, even during falling, so the roll completes first
       if (animRef.current) {

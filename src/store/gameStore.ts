@@ -129,7 +129,7 @@ export const useGameStore = create<GameStore>()(
         toBreak.forEach((k) => newBroken.add(k));
 
         // Handle switches — each activation toggles state
-        let newGrid = grid.map((row) => [...row]);
+        const newGrid = grid.map((row) => [...row]);
         const newActivated = new Set(activatedSwitches);
         const triggered = getActivatedSwitches(newBlock, { ...level, grid });
         triggered.forEach((swIdx) => {
