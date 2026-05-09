@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Star as StarIcon } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 import { LEVELS } from "../data/levels";
 
@@ -14,7 +15,6 @@ function Star({ index, earned }: { index: number; earned: boolean }) {
     <span
       style={{
         display: "inline-block",
-        fontSize: "2.8rem",
         color: earned ? "#c9963a" : "#1e1e30",
         filter:
           earned && visible
@@ -28,7 +28,7 @@ function Star({ index, earned }: { index: number; earned: boolean }) {
         transform: visible ? undefined : "scale(0)",
       }}
     >
-      ★
+      <StarIcon size={44} strokeWidth={1.5} fill={earned ? "#c9963a" : "none"} />
     </span>
   );
 }
@@ -137,10 +137,8 @@ export default function LevelCompleteScreen() {
           </div>
           <div style={{ height: 1, background: "#1a281c" }} />
           <div style={rowStyle}>
-            <span style={{ color: "#4a7055", fontWeight: 500 }}>Par</span>
-            <span style={{ color: "#c9963a", fontWeight: 600 }}>
-              ★ {level?.optimalMoves}
-            </span>
+            <span style={{ color: "#4a7055", fontWeight: 500 }}>Optimal moves</span>
+            <span style={{ color: "#c9963a", fontWeight: 600 }}>{level?.optimalMoves}</span>
           </div>
         </div>
 

@@ -1,3 +1,5 @@
+import { Star } from "lucide-react";
+
 interface Props {
   onClose: () => void;
 }
@@ -138,18 +140,17 @@ export default function HowToPlayModal({ onClose }: Props) {
         {/* Stars */}
         <div style={{ marginBottom: 16 }}>
           <div style={sectionLabel}>Star Rating</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={rowText}>
-              <span style={{ color: "#c9963a" }}>★★★</span> — optimal moves or
-              fewer
-            </div>
-            <div style={rowText}>
-              <span style={{ color: "#c9963a" }}>★★</span> — within 50% extra
-              moves
-            </div>
-            <div style={rowText}>
-              <span style={{ color: "#c9963a" }}>★</span> — completed
-            </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {[3, 2, 1].map((count, i) => (
+              <div key={i} style={{ ...rowText, display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ display: "flex", gap: 2 }}>
+                  {[1, 2, 3].map((s) => (
+                    <Star key={s} size={11} strokeWidth={1.5} fill={s <= count ? "#c9963a" : "none"} style={{ color: s <= count ? "#c9963a" : "#2a2a3c" }} />
+                  ))}
+                </span>
+                <span>— {count === 3 ? "optimal moves or fewer" : count === 2 ? "within 50% extra moves" : "completed"}</span>
+              </div>
+            ))}
           </div>
         </div>
 

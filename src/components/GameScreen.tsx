@@ -49,7 +49,10 @@ export default function GameScreen() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const bufferedMove = useRef<Direction | null>(null);
   const isBusyRef = useRef(false);
-  isBusyRef.current = isAnimating || isFalling || isWinFalling;
+
+  useEffect(() => {
+    isBusyRef.current = isAnimating || isFalling || isWinFalling;
+  }, [isAnimating, isFalling, isWinFalling]);
 
   useEffect(() => {
     if (!isAnimating && bufferedMove.current && screen === "game") {
@@ -195,9 +198,9 @@ export default function GameScreen() {
         <div style={{ width: 1, height: 28, background: "#1e1e30" }} />
         <div style={{ textAlign: "center" }}>
           <div style={{ ...statValue, color: "#c9963a" }}>
-            ★ {level.optimalMoves}
+            {level.optimalMoves}
           </div>
-          <div style={statLabel}>Par</div>
+          <div style={statLabel}>Optimal</div>
         </div>
       </div>
 

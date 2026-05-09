@@ -1,3 +1,4 @@
+import { Lock, Star } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 import { LEVELS } from "../data/levels";
 
@@ -5,15 +6,13 @@ function StarRow({ count }: { count: number }) {
   return (
     <div style={{ display: "flex", gap: 3 }}>
       {[1, 2, 3].map((i) => (
-        <span
+        <Star
           key={i}
-          style={{
-            fontSize: 13,
-            color: i <= count ? "#c9963a" : "#2a2a3c",
-          }}
-        >
-          ★
-        </span>
+          size={13}
+          strokeWidth={1.5}
+          fill={i <= count ? "#c9963a" : "none"}
+          style={{ color: i <= count ? "#c9963a" : "#2a2a3c" }}
+        />
       ))}
     </div>
   );
@@ -149,10 +148,14 @@ export default function LevelSelectScreen() {
                 {unlocked ? (
                   <StarRow count={stars} />
                 ) : (
-                  <div style={{ fontSize: "1rem", color: "#252535" }}>🔒</div>
+                  <Lock
+                    size={14}
+                    strokeWidth={1.5}
+                    style={{ color: "#252535" }}
+                  />
                 )}
 
-                {/* Par badge */}
+                {/* Optimal badge */}
                 {unlocked && (
                   <div
                     style={{
@@ -160,12 +163,23 @@ export default function LevelSelectScreen() {
                       top: 10,
                       right: 10,
                       fontFamily: "'Space Grotesk', sans-serif",
-                      fontWeight: 600,
-                      fontSize: "0.7rem",
-                      color: "#c9963a",
+                      fontWeight: 500,
+                      fontSize: "0.62rem",
+                      color: "#5a5a80",
+                      textAlign: "right",
+                      lineHeight: 1.2,
                     }}
                   >
-                    ★ {level.optimalMoves}
+                    <div
+                      style={{
+                        color: "#c9963a",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                      }}
+                    >
+                      {level.optimalMoves}
+                    </div>
+                    <div>optimal</div>
                   </div>
                 )}
               </button>
