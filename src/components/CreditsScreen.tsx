@@ -149,13 +149,17 @@ export default function CreditsScreen() {
               <div style={label}>Remix</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 {[
-                  { name: "Daniel", handle: "Dano796" },
-                  { name: "Emanuel", handle: "Emanuel0428" },
-                  { name: "Anthony", handle: "Thony-arango" },
+                  { name: "Daniel", handle: "dano796" },
+                  { name: "Emanuel", handle: "emanuel0428" },
+                  { name: "Anthony", handle: "thony-arango" },
                 ].map(({ name, handle }) => (
                   <div
                     key={handle}
-                    style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "baseline",
+                    }}
                   >
                     <span style={value}>{name}</span>
                     <span style={sub}>@{handle}</span>
