@@ -142,6 +142,27 @@ export default function CreditsScreen() {
               <div style={label}>Font</div>
               <div style={sub}>Space Grotesk — Google Fonts</div>
             </div>
+
+            <div style={{ height: 1, background: "#1a1a28" }} />
+
+            <div>
+              <div style={label}>Remix</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {[
+                  { name: "Daniel", handle: "Dano796" },
+                  { name: "Emanuel", handle: "Emanuel0428" },
+                  { name: "Anthony", handle: "Thony-arango" },
+                ].map(({ name, handle }) => (
+                  <div
+                    key={handle}
+                    style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}
+                  >
+                    <span style={value}>{name}</span>
+                    <span style={sub}>@{handle}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
