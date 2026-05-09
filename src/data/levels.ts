@@ -121,9 +121,9 @@ export const LEVELS: Level[] = [
       [1, 1, 1, 1],
       [0, 1, 2, 1],
       [0, 1, 3, 1],
-      [0, 1, 1, 1]
+      [0, 1, 1, 1],
     ],
-    start: { x1: 0, y1: 0, x2: 0, y2: 0 }
+    start: { x1: 0, y1: 0, x2: 0, y2: 0 },
   },
   {
     id: 7,
@@ -136,15 +136,15 @@ export const LEVELS: Level[] = [
       [0, 0, 0, 0, 1, 1],
       [0, 0, 0, 1, 1, 1],
       [0, 2, 1, 1, 1, 3],
-      [0, 0, 1, 1, 1, 1]
+      [0, 0, 1, 1, 1, 1],
     ],
-    start: { x1: 0, y1: 0, x2: 0, y2: 0 }
+    start: { x1: 0, y1: 0, x2: 0, y2: 0 },
   },
   {
     id: 8,
     name: "The Vault",
     description: "Two switches, two bridges. Unlock the vault.",
-    optimalMoves: 24,
+    optimalMoves: 9,
     grid: [
       [1, 1, 1, 0, 1, 1],
       [1, 1, 1, 0, 1, 1],
@@ -152,7 +152,7 @@ export const LEVELS: Level[] = [
       [1, 1, 1, 1, 1, 1],
       [1, 1, 1, 0, 1, 1],
       [0, 0, 0, 1, 1, 2],
-      [0, 0, 0, 1, 1, 1]
+      [0, 0, 0, 1, 1, 1],
     ],
     start: { x1: 0, y1: 0, x2: 0, y2: 0 },
     switches: [
@@ -160,15 +160,15 @@ export const LEVELS: Level[] = [
         x: 1,
         y: 4,
         type: "hard",
-        toggleTiles: [{ x: 3, y: 1, on: 1, off: 0 }]
+        toggleTiles: [{ x: 3, y: 1, on: 1, off: 0 }],
       },
       {
         x: 4,
         y: 1,
         type: "hard",
-        toggleTiles: [{ x: 3, y: 4, on: 1, off: 0 }]
-      }
-    ]
+        toggleTiles: [{ x: 3, y: 4, on: 1, off: 0 }],
+      },
+    ],
   },
   {
     id: 9,
@@ -184,7 +184,7 @@ export const LEVELS: Level[] = [
       [0, 1, 1, 1, 0, 0, 0, 0, 0],
       [0, 1, 4, 1, 0, 1, 5, 1, 1],
       [0, 1, 1, 1, 0, 1, 1, 1, 1],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
     ],
     start: { x1: 1, y1: 1, x2: 1, y2: 1 },
     switches: [
@@ -194,24 +194,22 @@ export const LEVELS: Level[] = [
         type: "soft",
         toggleTiles: [
           { x: 3, y: 4, on: 0, off: 1 },
-          { x: 4, y: 7, on: 1, off: 0 }
-        ]
+          { x: 4, y: 7, on: 1, off: 0 },
+        ],
       },
       {
         x: 6,
         y: 6,
         type: "hard",
-        toggleTiles: [
-          { x: 6, y: 5, on: 1, off: 0 }
-        ]
-      }
-    ]
+        toggleTiles: [{ x: 6, y: 5, on: 1, off: 0 }],
+      },
+    ],
   },
   {
     id: 10,
     name: "The Masterpiece",
     description: "A one-way journey. Don't look back.",
-    optimalMoves: 16,
+    optimalMoves: 15,
     grid: [
       [0, 1, 1, 1, 0, 1, 1, 1],
       [0, 1, 1, 1, 0, 1, 2, 1],
@@ -220,7 +218,7 @@ export const LEVELS: Level[] = [
       [0, 1, 1, 1, 1, 1, 1, 1],
       [0, 1, 5, 1, 1, 1, 1, 1],
       [0, 1, 1, 1, 1, 1, 1, 1],
-      [0, 1, 1, 1, 1, 1, 1, 1]
+      [0, 1, 1, 1, 1, 1, 1, 1],
     ],
     start: { x1: 2, y1: 1, x2: 2, y2: 1 },
     switches: [
@@ -228,10 +226,8 @@ export const LEVELS: Level[] = [
         x: 2,
         y: 5,
         type: "hard",
-        toggleTiles: [
-          { x: 6, y: 3, on: 1, off: 0 }
-        ]
-      }
-    ]
-  }
+        toggleTiles: [{ x: 6, y: 3, on: 1, off: 0 }],
+      },
+    ],
+  },
 ];
