@@ -2,92 +2,132 @@ import { useState } from 'react'
 import { useGameStore } from '../store/gameStore'
 import HowToPlayModal from './HowToPlayModal'
 
+const btn = {
+  primary: {
+    padding: '14px 0',
+    borderRadius: 12,
+    border: 'none',
+    background: '#6b7cf8',
+    color: '#fff',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontWeight: 700,
+    fontSize: '1rem',
+    letterSpacing: '0.06em',
+    cursor: 'pointer',
+    width: '100%',
+    boxShadow: '0 4px 20px rgba(107,124,248,0.35), 0 1px 0 rgba(255,255,255,0.1) inset',
+    transition: 'transform 0.08s, box-shadow 0.08s',
+  } as React.CSSProperties,
+  secondary: {
+    padding: '12px 0',
+    borderRadius: 12,
+    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'rgba(255,255,255,0.04)',
+    color: '#a8a8cc',
+    fontFamily: "'Space Grotesk', sans-serif",
+    fontWeight: 500,
+    fontSize: '0.875rem',
+    letterSpacing: '0.06em',
+    cursor: 'pointer',
+    width: '100%',
+    transition: 'transform 0.08s, background 0.1s',
+  } as React.CSSProperties,
+}
+
 export default function HomeScreen() {
   const setScreen = useGameStore(s => s.setScreen)
   const [showHow, setShowHow] = useState(false)
 
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-center bg-navy screen-enter"
-      style={{ background: 'radial-gradient(ellipse at 50% 30%, #0d1a3a 0%, #0a0a1a 70%)' }}
+      className="fixed inset-0 flex flex-col items-center justify-center screen-enter"
+      style={{ background: 'linear-gradient(160deg, #12121c 0%, #0e0e14 60%, #111020 100%)' }}
     >
-      <div className="absolute inset-0 bg-grid opacity-20" />
+      {/* Ambient glow */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse 55% 35% at 50% 30%, rgba(107,124,248,0.08) 0%, transparent 70%)'
+      }} />
 
-      {/* Decorative corner pieces */}
-      <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-blue-600 opacity-50" />
-      <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-blue-600 opacity-50" />
-      <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-blue-600 opacity-50" />
-      <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-blue-600 opacity-50" />
+      <div className="relative z-10 flex flex-col items-center w-full max-w-xs px-6" style={{ gap: 28 }}>
 
-      <div className="relative z-10 flex flex-col items-center gap-6 px-8 w-full max-w-sm">
+        {/* Block preview */}
+        <div style={{ perspective: '240px', perspectiveOrigin: '50% 30%', marginBottom: 4 }}>
+          <div style={{
+            transform: 'rotateX(18deg) rotateY(-14deg)',
+            transformStyle: 'preserve-3d',
+            animation: 'blockFloat 3s ease-in-out infinite',
+          }}>
+            <div style={{
+              width: 36,
+              height: 72,
+              borderRadius: 6,
+              background: 'linear-gradient(145deg, #5a72f0 0%, #3f56d0 50%, #2840b8 100%)',
+              boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.18), 3px 3px 0 #1a2890, 5px 5px 0 #111f70',
+            }} />
+          </div>
+        </div>
+
         {/* Title */}
-        <div className="text-center mb-4">
-          <h1
-            className="font-display font-black text-4xl sm:text-5xl text-white neon-blue tracking-widest"
-            style={{ letterSpacing: '0.2em' }}
-          >
-            SQ<span className="text-purple-400 neon-purple">UA</span>RED
+        <div style={{ textAlign: 'center', lineHeight: 1 }}>
+          <h1 style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 800,
+            fontSize: '2.6rem',
+            letterSpacing: '0.12em',
+            color: '#e6e4f0',
+            marginBottom: 6,
+          }}>
+            SQUARED
           </h1>
-          <p className="font-body text-blue-400 text-xs tracking-widest mt-2 uppercase">
+          <p style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 400,
+            fontSize: '0.7rem',
+            letterSpacing: '0.3em',
+            color: '#6b7cf8',
+            textTransform: 'uppercase',
+          }}>
             Roll · Think · Conquer
           </p>
         </div>
 
-        {/* Mini block preview */}
-        <div className="relative my-2" style={{ perspective: '200px' }}>
-          <div
-            className="block-standing rounded"
-            style={{
-              width: 32,
-              height: 64,
-              transform: 'rotateX(15deg) rotateY(-10deg)',
-              animation: 'float 2.5s ease-in-out infinite',
-            }}
-          />
-        </div>
-
         {/* Buttons */}
-        <button
-          className="w-full py-4 font-display font-bold text-lg tracking-widest text-white rounded-sm border-2 border-blue-500 transition-all duration-150 active:scale-95"
-          style={{
-            background: 'linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%)',
-            boxShadow: '0 0 20px rgba(59,130,246,0.4), 0 4px 0 #1e3a8a',
-            letterSpacing: '0.2em',
-          }}
-          onClick={() => setScreen('levelSelect')}
-        >
-          PLAY
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+          <button
+            style={btn.primary}
+            onPointerDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+            onPointerUp={e => { e.currentTarget.style.transform = ''; setScreen('levelSelect') }}
+            onPointerLeave={e => (e.currentTarget.style.transform = '')}
+          >
+            Play
+          </button>
 
-        <button
-          className="w-full py-3 font-display font-semibold text-sm tracking-widest text-purple-300 rounded-sm border border-purple-700 transition-all duration-150 active:scale-95"
-          style={{
-            background: 'rgba(88, 28, 135, 0.2)',
-            letterSpacing: '0.2em',
-          }}
-          onClick={() => setShowHow(true)}
-        >
-          HOW TO PLAY
-        </button>
+          <button
+            style={btn.secondary}
+            onPointerDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+            onPointerUp={e => { e.currentTarget.style.transform = ''; setShowHow(true) }}
+            onPointerLeave={e => (e.currentTarget.style.transform = '')}
+          >
+            How to Play
+          </button>
 
-        <button
-          className="w-full py-3 font-display font-semibold text-sm tracking-widest text-blue-400 rounded-sm border border-blue-800 transition-all duration-150 active:scale-95"
-          style={{
-            background: 'rgba(30, 58, 138, 0.2)',
-            letterSpacing: '0.15em',
-          }}
-          onClick={() => setScreen('credits')}
-        >
-          CREDITS
-        </button>
+          <button
+            style={btn.secondary}
+            onPointerDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+            onPointerUp={e => { e.currentTarget.style.transform = ''; setScreen('credits') }}
+            onPointerLeave={e => (e.currentTarget.style.transform = '')}
+          >
+            Credits
+          </button>
+        </div>
       </div>
 
       {showHow && <HowToPlayModal onClose={() => setShowHow(false)} />}
 
       <style>{`
-        @keyframes float {
-          0%, 100% { transform: rotateX(15deg) rotateY(-10deg) translateY(0); }
-          50% { transform: rotateX(15deg) rotateY(-10deg) translateY(-10px); }
+        @keyframes blockFloat {
+          0%, 100% { transform: rotateX(18deg) rotateY(-14deg) translateY(0); }
+          50% { transform: rotateX(18deg) rotateY(-14deg) translateY(-10px); }
         }
       `}</style>
     </div>

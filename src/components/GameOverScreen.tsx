@@ -4,52 +4,97 @@ export default function GameOverScreen() {
   const { resetLevel, setScreen } = useGameStore()
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center screen-enter"
-      style={{ background: 'radial-gradient(ellipse at center, #1a0505 0%, #0a0a1a 70%)' }}
+    <div
+      className="fixed inset-0 flex flex-col items-center justify-center screen-enter"
+      style={{ background: 'linear-gradient(160deg, #12121c 0%, #0e0e14 60%, #18100e 100%)' }}
     >
-      <div className="absolute inset-0 bg-grid opacity-10" />
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 24,
+        padding: '0 24px',
+        width: '100%',
+        maxWidth: 300,
+        textAlign: 'center',
+      }}>
 
-      <div className="relative z-10 flex flex-col items-center gap-6 px-8 w-full max-w-xs text-center">
-        {/* Falling block animation */}
-        <div className="relative w-16 h-16 mx-auto mb-4">
-          <div
-            className="block-standing rounded-sm mx-auto"
-            style={{
-              width: 28,
-              height: 56,
-              animation: 'fall 0.6s ease-in forwards',
-            }}
-          />
+        {/* Falling block */}
+        <div style={{ width: 28, height: 56, marginBottom: 4 }}>
+          <div style={{
+            width: 28,
+            height: 56,
+            borderRadius: 5,
+            background: 'linear-gradient(145deg, #5a72f0 0%, #3f56d0 50%, #2840b8 100%)',
+            boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.15), 2px 2px 0 #1a2890',
+            animation: 'fall 0.6s ease-in forwards',
+          }} />
         </div>
 
         <div>
-          <h2 className="font-display font-black text-4xl text-red-400 tracking-widest mb-2"
-            style={{ textShadow: '0 0 20px rgba(239,68,68,0.6)', letterSpacing: '0.15em' }}>
-            YOU FELL!
+          <h2 style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 800,
+            fontSize: '2rem',
+            color: '#d85a5a',
+            letterSpacing: '0.06em',
+            marginBottom: 6,
+          }}>
+            You fell!
           </h2>
-          <p className="font-body text-sm text-red-700 tracking-widest">
+          <p style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 400,
+            fontSize: '0.8rem',
+            color: '#5a3535',
+          }}>
             The void claims another block
           </p>
         </div>
 
-        <button
-          className="w-full py-4 font-display font-bold tracking-widest text-white rounded-sm border-2 border-red-700 active:scale-95 transition-transform"
-          style={{
-            background: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%)',
-            boxShadow: '0 0 20px rgba(239,68,68,0.3), 0 4px 0 #450a0a',
-            letterSpacing: '0.2em',
-          }}
-          onClick={resetLevel}
-        >
-          TRY AGAIN
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+          <button
+            onClick={resetLevel}
+            style={{
+              width: '100%',
+              padding: '14px 0',
+              borderRadius: 12,
+              border: 'none',
+              background: '#d85a5a',
+              color: '#fff',
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              boxShadow: '0 4px 16px rgba(216,90,90,0.3)',
+              transition: 'transform 0.08s',
+            }}
+            onPointerDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+            onPointerUp={e => (e.currentTarget.style.transform = '')}
+            onPointerLeave={e => (e.currentTarget.style.transform = '')}
+          >
+            Try Again
+          </button>
 
-        <button
-          className="font-body text-xs text-red-800 tracking-widest active:opacity-60"
-          onClick={() => setScreen('levelSelect')}
-        >
-          BACK TO LEVELS
-        </button>
+          <button
+            onClick={() => setScreen('levelSelect')}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: "'Space Grotesk', sans-serif",
+              fontWeight: 400,
+              fontSize: '0.8rem',
+              color: '#4a3040',
+              padding: '8px 0',
+              transition: 'color 0.1s',
+            }}
+            onPointerEnter={e => (e.currentTarget.style.color = '#7070a0')}
+            onPointerLeave={e => (e.currentTarget.style.color = '#4a3040')}
+          >
+            Back to Levels
+          </button>
+        </div>
       </div>
     </div>
   )

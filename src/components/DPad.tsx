@@ -23,19 +23,17 @@ export default function DPad({ onMove }: Props) {
   const handleRelease = () => setPressed(null)
 
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 64px)',
-        gridTemplateRows: 'repeat(3, 64px)',
-        gap: 4,
-      }}
-    >
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: 'repeat(3, 62px)',
+      gridTemplateRows: 'repeat(3, 62px)',
+      gap: 6,
+    }}>
       {DIRS.map(({ dir, label, gridArea }) => (
         <button
           key={dir}
-          className={`dpad-btn text-white text-xl ${pressed === dir ? 'pressed' : ''}`}
-          style={{ gridArea }}
+          className={`dpad-btn ${pressed === dir ? 'pressed' : ''}`}
+          style={{ gridArea, color: pressed === dir ? '#a0aeff' : '#5060a0', fontSize: '1.1rem' }}
           onPointerDown={(e) => { e.preventDefault(); handlePress(dir) }}
           onPointerUp={handleRelease}
           onPointerLeave={handleRelease}
@@ -44,15 +42,13 @@ export default function DPad({ onMove }: Props) {
         </button>
       ))}
 
-      {/* Center dot */}
-      <div
-        className="rounded-sm"
-        style={{
-          gridArea: '2 / 2',
-          background: 'rgba(30, 58, 138, 0.4)',
-          border: '1px solid rgba(59,130,246,0.2)',
-        }}
-      />
+      {/* Center */}
+      <div style={{
+        gridArea: '2 / 2',
+        borderRadius: 12,
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.05)',
+      }} />
     </div>
   )
 }

@@ -11,17 +11,32 @@ function formatTime(secs: number): string {
   return `${m}:${s}`
 }
 
+const statLabel: React.CSSProperties = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontWeight: 400,
+  fontSize: '0.6rem',
+  letterSpacing: '0.15em',
+  color: '#4a4a70',
+  textTransform: 'uppercase',
+  marginTop: 2,
+}
+
+const statValue: React.CSSProperties = {
+  fontFamily: "'Space Grotesk', sans-serif",
+  fontWeight: 700,
+  fontSize: '1.1rem',
+  color: '#e6e4f0',
+  lineHeight: 1,
+}
+
 export default function GameScreen() {
   const { currentLevel, moves, time, screen, moveBlock, resetLevel, setScreen, tickTime, isAnimating, isFalling, isWinFalling } = useGameStore()
   const level = LEVELS[currentLevel]
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const bufferedMove = useRef<Direction | null>(null)
-  const isAnimatingRef = useRef(isAnimating)
   const isBusyRef = useRef(false)
-  isAnimatingRef.current = isAnimating
   isBusyRef.current = isAnimating || isFalling || isWinFalling
 
-  // Flush buffered move when animation ends
   useEffect(() => {
     if (!isAnimating && bufferedMove.current && screen === 'game') {
       const dir = bufferedMove.current
@@ -46,7 +61,7 @@ export default function GameScreen() {
     if (!dir) return
     e.preventDefault()
     if (isBusyRef.current) {
-      bufferedMove.current = dir  // overwrite — only latest buffered move is kept
+      bufferedMove.current = dir
     } else {
       moveBlock(dir)
     }
@@ -60,54 +75,109 @@ export default function GameScreen() {
   if (!level) return null
 
   return (
-    <div className="fixed inset-0 flex flex-col screen-enter" style={{ background: '#060612' }}>
-      {/* Header HUD */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-blue-900/40 flex-shrink-0">
+    <div className="fixed inset-0 flex flex-col screen-enter" style={{ background: '#0e0e14' }}>
+
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '14px 18px 10px',
+        borderBottom: '1px solid #1a1a28',
+        flexShrink: 0,
+      }}>
         <button
-          className="font-body text-xs text-blue-500 active:opacity-60 tracking-wider"
           onClick={() => setScreen('levelSelect')}
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 500,
+            fontSize: '0.82rem',
+            color: '#6b7cf8',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+          }}
         >
-          ← EXIT
+          Exit
         </button>
-        <div className="flex flex-col items-center">
-          <span className="font-display font-bold text-white text-sm tracking-wider">{level.name}</span>
-          <span className="font-body text-xs text-blue-700 tracking-widest">
-            LVL {String(level.id).padStart(2, '0')}
-          </span>
+
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 700,
+            fontSize: '0.95rem',
+            color: '#e6e4f0',
+            letterSpacing: '0.04em',
+          }}>
+            {level.name}
+          </div>
+          <div style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 400,
+            fontSize: '0.65rem',
+            color: '#3a3a5e',
+            letterSpacing: '0.1em',
+          }}>
+            Level {String(level.id).padStart(2, '0')}
+          </div>
         </div>
+
         <button
-          className="font-body text-xs text-blue-500 active:opacity-60 tracking-wider"
           onClick={resetLevel}
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontWeight: 500,
+            fontSize: '0.82rem',
+            color: '#6b7cf8',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+          }}
         >
-          RESET
+          Reset
         </button>
       </div>
 
-      {/* Stats bar */}
-      <div className="flex items-center justify-center gap-8 py-2 border-b border-blue-900/20 flex-shrink-0">
-        <div className="text-center">
-          <div className="font-display text-lg font-bold text-white tabular-nums">{moves}</div>
-          <div className="font-body text-xs text-blue-700 tracking-widest">MOVES</div>
+      {/* Stats */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 32,
+        padding: '10px 0',
+        borderBottom: '1px solid #141420',
+        flexShrink: 0,
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={statValue}>{moves}</div>
+          <div style={statLabel}>Moves</div>
         </div>
-        <div className="w-px h-8 bg-blue-900/60" />
-        <div className="text-center">
-          <div className="font-display text-lg font-bold text-white tabular-nums">{formatTime(time)}</div>
-          <div className="font-body text-xs text-blue-700 tracking-widest">TIME</div>
+        <div style={{ width: 1, height: 28, background: '#1e1e30' }} />
+        <div style={{ textAlign: 'center' }}>
+          <div style={statValue}>{formatTime(time)}</div>
+          <div style={statLabel}>Time</div>
         </div>
-        <div className="w-px h-8 bg-blue-900/60" />
-        <div className="text-center">
-          <div className="font-display text-lg font-bold text-yellow-500 tabular-nums">★{level.optimalMoves}</div>
-          <div className="font-body text-xs text-blue-700 tracking-widest">BEST</div>
+        <div style={{ width: 1, height: 28, background: '#1e1e30' }} />
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ ...statValue, color: '#c9963a' }}>★ {level.optimalMoves}</div>
+          <div style={statLabel}>Par</div>
         </div>
       </div>
 
-      {/* Canvas board — GameBoard handles its own sizing */}
+      {/* Canvas */}
       <div className="flex-1 flex items-center justify-center overflow-hidden">
         <GameBoard />
       </div>
 
       {/* D-Pad */}
-      <div className="flex-shrink-0 flex items-center justify-center py-3 pb-5">
+      <div style={{
+        flexShrink: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingBottom: 28,
+        paddingTop: 8,
+      }}>
         <DPad onMove={(dir) => {
           if (isBusyRef.current) { bufferedMove.current = dir } else { moveBlock(dir) }
         }} />
