@@ -30,10 +30,13 @@ export default function CreditsScreen() {
 
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-center screen-enter"
+      className="fixed inset-0 flex flex-col items-center screen-enter"
       style={{
         background:
           "linear-gradient(160deg, #12121c 0%, #0e0e14 60%, #111020 100%)",
+        overflowY: "auto",
+        WebkitOverflowScrolling: "touch",
+        padding: "28px 0 40px",
       }}
     >
       <div
@@ -45,6 +48,7 @@ export default function CreditsScreen() {
           padding: "0 24px",
           width: "100%",
           maxWidth: 340,
+          margin: "0 auto",
         }}
       >
         {/* Title */}

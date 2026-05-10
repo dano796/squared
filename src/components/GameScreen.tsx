@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback } from "react";
-import { ChevronLeft, RotateCcw } from "lucide-react";
+import { useEffect, useRef, useCallback, useState } from "react";
+import { ChevronLeft, Pause, RotateCcw } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 import { LEVELS } from "../data/levels";
 import GameBoard from "./GameBoard";
@@ -46,6 +46,7 @@ export default function GameScreen() {
     isFalling,
     isWinFalling,
   } = useGameStore();
+  const [isPaused, setIsPaused] = useState(false);
   const level = LEVELS[currentLevel];
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const bufferedMove = useRef<Direction | null>(null);
@@ -64,16 +65,20 @@ export default function GameScreen() {
   }, [isAnimating, screen, moveBlock]);
 
   useEffect(() => {
-    if (screen !== "game") return;
+    if (screen !== "game" || isPaused) return;
     timerRef.current = setInterval(tickTime, 1000);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [screen, tickTime]);
+  }, [screen, tickTime, isPaused]);
+
+  useEffect(() => {
+    if (screen !== "game") setIsPaused(false);
+  }, [screen]);
 
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
-      if (screen !== "game") return;
+      if (screen !== "game" || isPaused) return;
       const map: Record<string, Direction> = {
         ArrowUp: "up",
         ArrowDown: "down",
@@ -93,7 +98,7 @@ export default function GameScreen() {
         moveBlock(dir);
       }
     },
-    [screen, moveBlock],
+    [screen, moveBlock, isPaused],
   );
 
   useEffect(() => {
@@ -164,7 +169,7 @@ export default function GameScreen() {
         </div>
 
         <button
-          onClick={resetLevel}
+          onClick={() => setIsPaused(true)}
           style={{
             fontFamily: "'Space Grotesk', sans-serif",
             fontWeight: 500,
@@ -178,8 +183,8 @@ export default function GameScreen() {
             gap: 4,
           }}
         >
-          <RotateCcw size={14} strokeWidth={2} />
-          Reset
+          <Pause size={14} strokeWidth={2} />
+          Pause
         </button>
       </div>
 
@@ -231,6 +236,7 @@ export default function GameScreen() {
       >
         <DPad
           onMove={(dir) => {
+            if (isPaused) return;
             if (isBusyRef.current) {
               bufferedMove.current = dir;
             } else {
@@ -239,6 +245,138 @@ export default function GameScreen() {
           }}
         />
       </div>
+
+      {isPaused && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "radial-gradient(circle at 30% 20%, rgba(20, 20, 36, 0.9), rgba(6, 6, 12, 0.88))",
+            backdropFilter: "blur(6px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 20,
+          }}
+        >
+          <div
+            style={{
+              width: "min(420px, 90vw)",
+              background: "linear-gradient(180deg, #141422 0%, #0e0e18 100%)",
+              border: "1px solid #23233a",
+              borderRadius: 16,
+              padding: "22px 20px",
+              boxShadow:
+                "0 18px 40px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(107, 124, 248, 0.08)",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                width: 48,
+                height: 4,
+                margin: "0 auto 12px",
+                borderRadius: 999,
+                background: "linear-gradient(90deg, #6b7cf8, #9ba7ff)",
+                boxShadow: "0 0 12px rgba(107, 124, 248, 0.5)",
+              }}
+            />
+            <div
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700,
+                fontSize: "1.15rem",
+                color: "#e6e4f0",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+              }}
+            >
+              Paused
+            </div>
+            <div
+              style={{
+                marginTop: 6,
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 400,
+                fontSize: "0.75rem",
+                color: "#7a7aa2",
+                letterSpacing: "0.08em",
+              }}
+            >
+              Level {String(level.id).padStart(2, "0")} · {level.name}
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gap: 10,
+                marginTop: 18,
+              }}
+            >
+              <button
+                onClick={() => setIsPaused(false)}
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  color: "#0b0b12",
+                  background: "linear-gradient(180deg, #6b7cf8 0%, #8d9bfc 80%)",
+                  border: "1px solid rgba(155, 167, 255, 0.6)",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  cursor: "pointer",
+                  boxShadow: "0 10px 20px rgba(107, 124, 248, 0.25)",
+                }}
+              >
+                Resume
+              </button>
+              <button
+                onClick={() => {
+                  setIsPaused(false);
+                  resetLevel();
+                }}
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  color: "#6b7cf8",
+                  background: "rgba(107, 124, 248, 0.08)",
+                  border: "1px solid #2f3352",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                }}
+              >
+                <RotateCcw size={15} strokeWidth={2} />
+                Reset Level
+              </button>
+              <button
+                onClick={() => {
+                  setIsPaused(false);
+                  setScreen("levelSelect");
+                }}
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  color: "#9a9abd",
+                  background: "rgba(20, 20, 32, 0.6)",
+                  border: "1px solid #25253d",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  cursor: "pointer",
+                }}
+              >
+                Exit to Menu
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
