@@ -1,4 +1,3 @@
-import { ChevronLeft } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 
 export default function GameOverScreen() {
@@ -101,23 +100,24 @@ export default function GameOverScreen() {
           <button
             onClick={() => setScreen("levelSelect")}
             style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
+              width: "100%",
+              padding: "12px 0",
+              borderRadius: 12,
+              border: "1px solid #1e1e2e",
+              background: "rgba(255,255,255,0.03)",
+              color: "#7070a0",
               fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 400,
-              fontSize: "0.8rem",
-              color: "#4a3040",
-              padding: "8px 0",
-              transition: "color 0.1s",
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
+              fontWeight: 500,
+              fontSize: "0.875rem",
+              cursor: "pointer",
+              transition: "transform 0.08s",
             }}
-            onPointerEnter={(e) => (e.currentTarget.style.color = "#7070a0")}
-            onPointerLeave={(e) => (e.currentTarget.style.color = "#4a3040")}
+            onPointerDown={(e) =>
+              (e.currentTarget.style.transform = "scale(0.97)")
+            }
+            onPointerUp={(e) => (e.currentTarget.style.transform = "")}
+            onPointerLeave={(e) => (e.currentTarget.style.transform = "")}
           >
-            <ChevronLeft size={14} strokeWidth={2} />
             Back to Levels
           </button>
         </div>

@@ -185,17 +185,12 @@ export default function GameScreen() {
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 400,
-              fontSize: "0.65rem",
+              fontSize: "0.8rem",
               color: "#3a3a5e",
               letterSpacing: "0.1em",
             }}
           >
             Level {String(level.id).padStart(2, "0")}
-            {level.description && (
-              <span style={{ color: "#2e2e50", marginLeft: 6 }}>
-                · {level.description}
-              </span>
-            )}
           </div>
         </div>
 
