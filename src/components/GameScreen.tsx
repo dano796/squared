@@ -5,6 +5,7 @@ import { LEVELS } from "../data/levels";
 import GameBoard from "./GameBoard";
 import DPad from "./DPad";
 import type { Direction } from "../logic/blockLogic";
+import { playGameOver, playMove, playTileBreak, playTileUnlock, playWin } from "../utils/sounds";
 
 function formatTime(secs: number): string {
   const m = Math.floor(secs / 60)
@@ -45,6 +46,8 @@ export default function GameScreen() {
     isAnimating,
     isFalling,
     isWinFalling,
+    switchEventCount,
+    tileBreakCount,
   } = useGameStore();
   const [isPaused, setIsPaused] = useState(false);
   const level = LEVELS[currentLevel];
@@ -57,9 +60,26 @@ export default function GameScreen() {
   }, [isAnimating, isFalling, isWinFalling]);
 
   useEffect(() => {
+    if (isFalling) playGameOver();
+  }, [isFalling]);
+
+  useEffect(() => {
+    if (switchEventCount > 0) playTileUnlock();
+  }, [switchEventCount]);
+
+  useEffect(() => {
+    if (tileBreakCount > 0) playTileBreak();
+  }, [tileBreakCount]);
+
+  useEffect(() => {
+    if (isWinFalling) playWin();
+  }, [isWinFalling]);
+
+  useEffect(() => {
     if (!isAnimating && bufferedMove.current && screen === "game") {
       const dir = bufferedMove.current;
       bufferedMove.current = null;
+      playMove();
       moveBlock(dir);
     }
   }, [isAnimating, screen, moveBlock]);
@@ -95,6 +115,7 @@ export default function GameScreen() {
       if (isBusyRef.current) {
         bufferedMove.current = dir;
       } else {
+        playMove();
         moveBlock(dir);
       }
     },
@@ -240,6 +261,7 @@ export default function GameScreen() {
             if (isBusyRef.current) {
               bufferedMove.current = dir;
             } else {
+              playMove();
               moveBlock(dir);
             }
           }}

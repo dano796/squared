@@ -35,6 +35,8 @@ interface GameStore {
   isShaking: boolean;
   lastMoveDir: Direction | null;
   isAnimating: boolean;
+  switchEventCount: number;
+  tileBreakCount: number;
 
   setScreen: (s: Screen) => void;
   startLevel: (levelIndex: number) => void;
@@ -69,6 +71,8 @@ export const useGameStore = create<GameStore>()(
       isShaking: false,
       lastMoveDir: null,
       isAnimating: false,
+      switchEventCount: 0,
+      tileBreakCount: 0,
 
       setScreen: (screen) => set({ screen }),
 
@@ -145,11 +149,13 @@ export const useGameStore = create<GameStore>()(
         });
 
         const newMoves = moves + 1;
+        const switchFired = triggered.length > 0;
+        const tileBroke = toBreak.length > 0;
 
         if (result === "win") {
           const stars = calcStars(newMoves, level.optimalMoves);
           // Block rolls to goal then falls into the hole before win screen
-          set({
+          set((s) => ({
             block: newBlock,
             moves: newMoves,
             brokenTiles: newBroken,
@@ -157,7 +163,9 @@ export const useGameStore = create<GameStore>()(
             activatedSwitches: newActivated,
             lastMoveDir: dir,
             isWinFalling: true,
-          });
+            switchEventCount: switchFired ? s.switchEventCount + 1 : s.switchEventCount,
+            tileBreakCount: tileBroke ? s.tileBreakCount + 1 : s.tileBreakCount,
+          }));
           setTimeout(() => {
             set({ isWinFalling: false });
             get().completeLevel(stars);
@@ -165,14 +173,16 @@ export const useGameStore = create<GameStore>()(
           return;
         }
 
-        set({
+        set((s) => ({
           block: newBlock,
           moves: newMoves,
           brokenTiles: newBroken,
           dynamicGrid: newGrid,
           activatedSwitches: newActivated,
           lastMoveDir: dir,
-        });
+          switchEventCount: switchFired ? s.switchEventCount + 1 : s.switchEventCount,
+          tileBreakCount: tileBroke ? s.tileBreakCount + 1 : s.tileBreakCount,
+        }));
       },
 
       resetLevel: () => {
