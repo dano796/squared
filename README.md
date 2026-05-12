@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# Squared — Puzzle Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Juego de puzzle inspirado en Bloxorz. Rueda el bloque por el tablero isométrico y cáelo de pie en el agujero objetivo.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 + TypeScript + Vite
+- Zustand (estado global)
+- Tailwind CSS
+- Capacitor (Android)
+- Canvas 2D (renderizado isométrico custom)
 
-## React Compiler
+## Pantallas
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Splash** — animación de entrada
+2. **Home** — menú principal
+3. **Niveles** — selector de niveles con estrellas
+4. **Juego** — tablero isométrico con D-Pad y controles de teclado
+5. **Completado** — resultado con estrellas y tiempo
+6. **Game Over** — pantalla de derrota
+7. **Ajustes** — toggle de sonido, vibración y reset de progreso
+8. **Créditos** — equipo y tecnologías
 
-## Expanding the ESLint configuration
+## Controles
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Acción | Teclado |
+|---|---|
+| Mover | Flechas o WASD |
+| Reiniciar nivel | R |
+| Pausar | Pausa en pantalla |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Cómo correr
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Niveles
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+15 niveles con dificultad progresiva. Mecánicas incluidas:
+- Baldosas frágiles (se rompen si te paras sobre ellas)
+- Switches suaves (se activan con cualquier contacto)
+- Switches duros (solo se activan de pie)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Equipo
+
+| Nombre | GitHub |
+|---|---|
+| Daniel | @dano796 |
+| Emanuel | @emanuel0428 |
+| Anthony | @thony-arango |
