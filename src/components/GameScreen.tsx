@@ -191,6 +191,11 @@ export default function GameScreen() {
             }}
           >
             Level {String(level.id).padStart(2, "0")}
+            {level.description && (
+              <span style={{ color: "#2e2e50", marginLeft: 6 }}>
+                · {level.description}
+              </span>
+            )}
           </div>
         </div>
 
