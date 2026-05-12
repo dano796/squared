@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react";
-import { ChevronLeft, Pause, RotateCcw } from "lucide-react";
+import { ChevronLeft, Pause } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 import { LEVELS } from "../data/levels";
 import GameBoard from "./GameBoard";
@@ -273,8 +273,7 @@ export default function GameScreen() {
           style={{
             position: "fixed",
             inset: 0,
-            background: "radial-gradient(circle at 30% 20%, rgba(20, 20, 36, 0.9), rgba(6, 6, 12, 0.88))",
-            backdropFilter: "blur(6px)",
+            background: "rgba(6, 6, 12, 0.82)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -283,118 +282,118 @@ export default function GameScreen() {
         >
           <div
             style={{
-              width: "min(420px, 90vw)",
-              background: "linear-gradient(180deg, #141422 0%, #0e0e18 100%)",
-              border: "1px solid #23233a",
-              borderRadius: 16,
-              padding: "22px 20px",
-              boxShadow:
-                "0 18px 40px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(107, 124, 248, 0.08)",
+              width: "min(340px, 90vw)",
+              background: "#12121c",
+              border: "1px solid #1e1e2e",
+              borderRadius: 20,
+              padding: "28px 24px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 20,
               textAlign: "center",
             }}
           >
-            <div
-              style={{
-                width: 48,
-                height: 4,
-                margin: "0 auto 12px",
-                borderRadius: 999,
-                background: "linear-gradient(90deg, #6b7cf8, #9ba7ff)",
-                boxShadow: "0 0 12px rgba(107, 124, 248, 0.5)",
-              }}
-            />
-            <div
-              style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 700,
-                fontSize: "1.15rem",
-                color: "#e6e4f0",
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-              }}
-            >
-              Paused
-            </div>
-            <div
-              style={{
-                marginTop: 6,
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontWeight: 400,
-                fontSize: "0.75rem",
-                color: "#7a7aa2",
-                letterSpacing: "0.08em",
-              }}
-            >
-              Level {String(level.id).padStart(2, "0")} · {level.name}
+            <div>
+              <div
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 800,
+                  fontSize: "1.8rem",
+                  color: "#e6e4f0",
+                  letterSpacing: "0.06em",
+                  marginBottom: 4,
+                }}
+              >
+                Paused
+              </div>
+              <div
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontWeight: 400,
+                  fontSize: "0.8rem",
+                  color: "#4a4a70",
+                }}
+              >
+                Level {String(level.id).padStart(2, "0")} · {level.name}
+              </div>
             </div>
 
             <div
               style={{
-                display: "grid",
+                display: "flex",
+                flexDirection: "column",
                 gap: 10,
-                marginTop: 18,
+                width: "100%",
               }}
             >
               <button
                 onClick={() => setIsPaused(false)}
                 style={{
+                  width: "100%",
+                  padding: "14px 0",
+                  borderRadius: 12,
+                  border: "none",
+                  background: "#6b7cf8",
+                  color: "#fff",
                   fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  color: "#0b0b12",
-                  background: "linear-gradient(180deg, #6b7cf8 0%, #8d9bfc 80%)",
-                  border: "1px solid rgba(155, 167, 255, 0.6)",
-                  borderRadius: 10,
-                  padding: "10px 14px",
+                  fontWeight: 700,
+                  fontSize: "0.95rem",
                   cursor: "pointer",
-                  boxShadow: "0 10px 20px rgba(107, 124, 248, 0.25)",
+                  boxShadow: "0 4px 16px rgba(107,124,248,0.3)",
+                  transition: "transform 0.08s",
                 }}
+                onPointerDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+                onPointerUp={(e) => (e.currentTarget.style.transform = "")}
+                onPointerLeave={(e) => (e.currentTarget.style.transform = "")}
               >
                 Resume
               </button>
-              <button
-                onClick={() => {
-                  setIsPaused(false);
-                  resetLevel();
-                }}
-                style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  color: "#6b7cf8",
-                  background: "rgba(107, 124, 248, 0.08)",
-                  border: "1px solid #2f3352",
-                  borderRadius: 10,
-                  padding: "10px 14px",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                }}
-              >
-                <RotateCcw size={15} strokeWidth={2} />
-                Reset Level
-              </button>
-              <button
-                onClick={() => {
-                  setIsPaused(false);
-                  setScreen("levelSelect");
-                }}
-                style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  color: "#9a9abd",
-                  background: "rgba(20, 20, 32, 0.6)",
-                  border: "1px solid #25253d",
-                  borderRadius: 10,
-                  padding: "10px 14px",
-                  cursor: "pointer",
-                }}
-              >
-                Exit to Menu
-              </button>
+
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  onClick={() => { setIsPaused(false); resetLevel(); }}
+                  style={{
+                    flex: 1,
+                    padding: "12px 0",
+                    borderRadius: 12,
+                    border: "1px solid #1e1e2e",
+                    background: "rgba(255,255,255,0.03)",
+                    color: "#7070a0",
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontWeight: 500,
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                    transition: "transform 0.08s",
+                  }}
+                  onPointerDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+                  onPointerUp={(e) => (e.currentTarget.style.transform = "")}
+                  onPointerLeave={(e) => (e.currentTarget.style.transform = "")}
+                >
+                  Retry
+                </button>
+                <button
+                  onClick={() => { setIsPaused(false); setScreen("levelSelect"); }}
+                  style={{
+                    flex: 1,
+                    padding: "12px 0",
+                    borderRadius: 12,
+                    border: "1px solid #1e1e2e",
+                    background: "rgba(255,255,255,0.03)",
+                    color: "#7070a0",
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontWeight: 500,
+                    fontSize: "0.875rem",
+                    cursor: "pointer",
+                    transition: "transform 0.08s",
+                  }}
+                  onPointerDown={(e) => (e.currentTarget.style.transform = "scale(0.97)")}
+                  onPointerUp={(e) => (e.currentTarget.style.transform = "")}
+                  onPointerLeave={(e) => (e.currentTarget.style.transform = "")}
+                >
+                  Levels
+                </button>
+              </div>
             </div>
           </div>
         </div>
