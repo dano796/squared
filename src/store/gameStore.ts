@@ -47,7 +47,7 @@ interface GameStore {
   setAnimating: (v: boolean) => void;
 }
 
-function calcStars(moves: number, optimalMoves: number): number {
+export function calcStars(moves: number, optimalMoves: number): number {
   if (moves <= optimalMoves) return 3;
   if (moves <= optimalMoves * 1.5) return 2;
   return 1;

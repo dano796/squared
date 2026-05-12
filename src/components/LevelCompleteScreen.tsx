@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Star as StarIcon } from "lucide-react";
-import { useGameStore } from "../store/gameStore";
+import { useGameStore, calcStars } from "../store/gameStore";
 import { LEVELS } from "../data/levels";
 import { playLevelUp } from "../utils/sounds";
 
@@ -51,13 +51,12 @@ export default function LevelCompleteScreen() {
     currentLevel,
     moves,
     time,
-    levelStars,
     unlockedLevels,
     setScreen,
     startLevel,
   } = useGameStore();
   const level = LEVELS[currentLevel];
-  const stars = levelStars[currentLevel] ?? 0;
+  const stars = calcStars(moves, level?.optimalMoves ?? 0);
   const hasNext = currentLevel + 1 < LEVELS.length;
 
   useEffect(() => {
