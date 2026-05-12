@@ -35,5 +35,9 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
     "vite": "^8.0.10"
-  }
+  },
+  "overrides": {
+  "minimatch": "^9.0.0",
+  "tar": "^7.5.11"
+}
 }
