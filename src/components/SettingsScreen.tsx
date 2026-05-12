@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 
@@ -70,6 +71,8 @@ export default function SettingsScreen() {
     setVibrationEnabled,
     resetProgress,
   } = useGameStore();
+
+  const [showConfirm, setShowConfirm] = useState(false);
 
   return (
     <div
@@ -194,11 +197,7 @@ export default function SettingsScreen() {
           }}
         >
           <button
-            onClick={() => {
-              if (confirm("Reset all progress? This cannot be undone.")) {
-                resetProgress();
-              }
-            }}
+            onClick={() => setShowConfirm(true)}
             style={{
               width: "100%",
               padding: "14px 0",
@@ -216,6 +215,111 @@ export default function SettingsScreen() {
           </button>
         </div>
       </div>
+
+      {/* Reset progress confirmation modal */}
+      {showConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "0 32px",
+            zIndex: 100,
+          }}
+          onClick={() => setShowConfirm(false)}
+        >
+          <div
+            style={{
+              width: "100%",
+              maxWidth: 320,
+              borderRadius: 20,
+              border: "1px solid #1e1e2e",
+              background: "#13131e",
+              padding: "28px 24px 20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700,
+                fontSize: "1.1rem",
+                color: "#e6e4f0",
+                marginBottom: 4,
+              }}
+            >
+              Reset Progress
+            </div>
+            <div
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 400,
+                fontSize: "0.875rem",
+                color: "#4a4a70",
+                marginBottom: 16,
+              }}
+            >
+              All level progress will be lost. This cannot be undone.
+            </div>
+            <button
+              onClick={() => {
+                resetProgress();
+                setShowConfirm(false);
+              }}
+              style={{
+                width: "100%",
+                padding: "13px 0",
+                borderRadius: 12,
+                border: "none",
+                background: "#c0404a",
+                color: "#fff",
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700,
+                fontSize: "0.95rem",
+                cursor: "pointer",
+                boxShadow: "0 4px 16px rgba(192,64,74,0.3)",
+                transition: "transform 0.08s",
+              }}
+              onPointerDown={(e) =>
+                (e.currentTarget.style.transform = "scale(0.97)")
+              }
+              onPointerUp={(e) => (e.currentTarget.style.transform = "")}
+              onPointerLeave={(e) => (e.currentTarget.style.transform = "")}
+            >
+              Reset
+            </button>
+            <button
+              onClick={() => setShowConfirm(false)}
+              style={{
+                width: "100%",
+                padding: "12px 0",
+                borderRadius: 12,
+                border: "1px solid #1e1e2e",
+                background: "rgba(255,255,255,0.03)",
+                color: "#7070a0",
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 500,
+                fontSize: "0.875rem",
+                cursor: "pointer",
+                transition: "transform 0.08s",
+              }}
+              onPointerDown={(e) =>
+                (e.currentTarget.style.transform = "scale(0.97)")
+              }
+              onPointerUp={(e) => (e.currentTarget.style.transform = "")}
+              onPointerLeave={(e) => (e.currentTarget.style.transform = "")}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
