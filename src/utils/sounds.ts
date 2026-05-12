@@ -4,8 +4,10 @@ import moveUrl from "../../sounds/move.mp3?url";
 import levelUpUrl from "../../sounds/level_up.mp3?url";
 import tileUnlockUrl from "../../sounds/tile_unlock.mp3?url";
 import tileBreakUrl from "../../sounds/tile_break.mp3?url";
+import { useGameStore } from "../store/gameStore";
 
 function play(url: string) {
+  if (!useGameStore.getState().soundEnabled) return;
   const audio = new Audio(url);
   audio.play().catch(() => {});
 }

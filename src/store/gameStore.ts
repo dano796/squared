@@ -17,7 +17,8 @@ export type Screen =
   | "levelComplete"
   | "gameOver"
   | "credits"
-  | "howToPlay";
+  | "howToPlay"
+  | "settings";
 
 interface GameStore {
   screen: Screen;
@@ -37,6 +38,8 @@ interface GameStore {
   isAnimating: boolean;
   switchEventCount: number;
   tileBreakCount: number;
+  soundEnabled: boolean;
+  vibrationEnabled: boolean;
 
   setScreen: (s: Screen) => void;
   startLevel: (levelIndex: number) => void;
@@ -45,6 +48,9 @@ interface GameStore {
   tickTime: () => void;
   completeLevel: (stars: number) => void;
   setAnimating: (v: boolean) => void;
+  setSoundEnabled: (v: boolean) => void;
+  setVibrationEnabled: (v: boolean) => void;
+  resetProgress: () => void;
 }
 
 export function calcStars(moves: number, optimalMoves: number): number {
@@ -73,10 +79,19 @@ export const useGameStore = create<GameStore>()(
       isAnimating: false,
       switchEventCount: 0,
       tileBreakCount: 0,
+      soundEnabled: true,
+      vibrationEnabled: true,
 
       setScreen: (screen) => set({ screen }),
 
       setAnimating: (v) => set({ isAnimating: v }),
+
+      setSoundEnabled: (v) => set({ soundEnabled: v }),
+
+      setVibrationEnabled: (v) => set({ vibrationEnabled: v }),
+
+      resetProgress: () =>
+        set({ levelStars: {}, unlockedLevels: [0], screen: "home" }),
 
       startLevel: (idx) => {
         const level = LEVELS[idx];
@@ -218,6 +233,8 @@ export const useGameStore = create<GameStore>()(
       partialize: (state) => ({
         levelStars: state.levelStars,
         unlockedLevels: state.unlockedLevels,
+        soundEnabled: state.soundEnabled,
+        vibrationEnabled: state.vibrationEnabled,
       }),
     },
   ),

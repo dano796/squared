@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Settings } from "lucide-react";
 import { useGameStore } from "../store/gameStore";
 import HowToPlayModal from "./HowToPlayModal";
 
@@ -47,6 +48,27 @@ export default function HomeScreen() {
           "linear-gradient(160deg, #12121c 0%, #0e0e14 60%, #111020 100%)",
       }}
     >
+      <button
+        onClick={() => setScreen("settings")}
+        style={{
+          position: "absolute",
+          top: 20,
+          right: 20,
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          color: "#3a3a5e",
+          padding: 4,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "color 0.15s",
+        }}
+        onPointerEnter={(e) => (e.currentTarget.style.color = "#6b7cf8")}
+        onPointerLeave={(e) => (e.currentTarget.style.color = "#3a3a5e")}
+      >
+        <Settings size={20} strokeWidth={1.5} />
+      </button>
       {/* Ambient glow */}
       <div
         className="absolute inset-0 pointer-events-none"

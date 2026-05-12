@@ -6,6 +6,7 @@ import GameScreen from "./components/GameScreen";
 import LevelCompleteScreen from "./components/LevelCompleteScreen";
 import GameOverScreen from "./components/GameOverScreen";
 import CreditsScreen from "./components/CreditsScreen";
+import SettingsScreen from "./components/SettingsScreen";
 
 export default function App() {
   const screen = useGameStore((s) => s.screen);
@@ -19,6 +20,7 @@ export default function App() {
       {screen === "levelComplete" && <LevelCompleteScreen />}
       {screen === "gameOver" && <GameOverScreen />}
       {screen === "credits" && <CreditsScreen />}
+      {screen === "settings" && <SettingsScreen />}
     </>
   );
 }
