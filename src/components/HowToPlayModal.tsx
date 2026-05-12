@@ -161,6 +161,7 @@ export default function HowToPlayModal({ onClose }: Props) {
           <div style={sectionLabel}>Controls</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <div style={rowText}>Keyboard: Arrow keys or WASD</div>
+            <div style={rowText}>Press <b style={{ color: "#c8c6e0" }}>R</b> to restart the current level</div>
             <div style={rowText}>Mobile: on-screen D-Pad</div>
           </div>
         </div>
