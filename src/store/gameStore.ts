@@ -94,6 +94,8 @@ export const useGameStore = create<GameStore>()(
           isWinFalling: false,
           isShaking: false,
           lastMoveDir: null,
+          switchEventCount: 0,
+          tileBreakCount: 0,
           isAnimating: false,
         });
       },
