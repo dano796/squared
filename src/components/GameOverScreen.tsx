@@ -56,7 +56,7 @@ export default function GameOverScreen() {
             style={{
               fontFamily: "'Space Grotesk', sans-serif",
               fontWeight: 400,
-              fontSize: "0.8rem",
+              fontSize: "0.95rem",
               color: "#5a3535",
             }}
           >

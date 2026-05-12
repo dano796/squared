@@ -52,7 +52,7 @@ export const LEVELS: Level[] = [
     id: 3,
     name: "Careful Steps",
     description: "Fragile tiles break if you stand on them!",
-    optimalMoves: 24,
+    optimalMoves: 15,
     grid: [
       [0, 1, 1, 1, 1, 1, 0, 0],
       [1, 1, 1, 3, 3, 1, 0, 0],
