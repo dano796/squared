@@ -99,6 +99,11 @@ export default function GameScreen() {
   const handleKey = useCallback(
     (e: KeyboardEvent) => {
       if (screen !== "game" || isPaused) return;
+      if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        resetLevel();
+        return;
+      }
       const map: Record<string, Direction> = {
         ArrowUp: "up",
         ArrowDown: "down",
@@ -119,7 +124,7 @@ export default function GameScreen() {
         moveBlock(dir);
       }
     },
-    [screen, moveBlock, isPaused],
+    [screen, moveBlock, resetLevel, isPaused],
   );
 
   useEffect(() => {
